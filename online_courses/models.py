@@ -15,18 +15,19 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
-    
+
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'teacher'}, related_name='courses_taught')
-    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
+    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True, limit_choices_to={'role': 'student'})
      
     def clean(self):
         if self.teacher and self.teacher.role != 'teacher':
             raise ValidationError("Only teachers can be assigned to a course.")
-    
-        if self.teacher and self.teacher in self.students.all():
+
+        # Only perform this check if the object has been saved and has an id
+        if self.pk and self.teacher and self.teacher in self.students.all():
             raise ValidationError("A teacher cannot be enrolled in their own course.")
 
     def save(self, *args, **kwargs):
@@ -35,7 +36,7 @@ class Course(models.Model):
     
     def __str__(self):
         return f"{self.title} (Teacher: {self.teacher.username if self.teacher else 'None'})"
-
+    
 class Progress(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='progress')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='progress')
@@ -105,12 +106,17 @@ class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
     correct_answer = models.CharField(max_length=255)
+    choices = models.TextField(help_text="Варианты ответов через запятую")  # Добавляем поле для вариантов ответов
+    
+    def get_choices(self):
+        return self.choices.split(",")
     
     def __str__(self):
         return f"{self.text} (Quiz: {self.quiz.title})"
 
 class StudentAnswer(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     selected_answer = models.CharField(max_length=255)
     is_correct = models.BooleanField(default=False)

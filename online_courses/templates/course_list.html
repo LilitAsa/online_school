@@ -6,7 +6,7 @@
 <h1>Мои курсы</h1>
 <ul>
     {% for course in courses %}
-        <li><a href="{% url 'course_detail' course.id %}">{{ course.title }}</a></li>
+        <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>
     {% empty %}
         <p>Вы еще не записаны на курсы.</p>
     {% endfor %}

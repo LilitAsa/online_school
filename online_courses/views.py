@@ -3,10 +3,10 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404, redirect
 from .models import Course, Enrollment, Lesson, Quiz, Question, StudentAnswer, Homework, HomeworkSubmission
 from .forms import CourseForm, LessonForm, QuizForm, QuestionForm, CustomUserCreationForm
 from django import forms
+from django.contrib.auth.decorators import login_required
 
 
 # Главная страница
@@ -54,13 +54,13 @@ def course_list(request):
         courses = Course.objects.filter(teacher=request.user)
     else:
         courses = request.user.enrolled_courses.all()
-    return render(request, 'online_courses/courses/course_list.html', {'courses': courses})
+    return render(request, 'course_list.html', {'courses': courses})
 
 # Детали курса
 @login_required
-def course_detail(request, course_id):
+def course_detail(request, course_id):    
     course = get_object_or_404(Course, id=course_id)
-    return render(request, 'online_courses/courses/course_detail.html', {'course': course})
+    return render(request, 'course_detail.html', {'course': course})
 
 # Запись студента на курс
 @login_required
@@ -71,33 +71,6 @@ def enroll_course(request, course_id):
     
     Enrollment.objects.get_or_create(user=request.user, course=course)
     return redirect('online_courses:course_detail', course_id=course.id)
-
-# Управление курсами (только для преподавателей)
-@login_required
-def manage_courses(request):
-    if request.user.role != 'teacher':
-        raise PermissionDenied("Только преподаватели могут управлять курсами.")
-    
-    courses = Course.objects.filter(teacher=request.user)
-    return render(request, 'courses/manage_courses.html', {'courses': courses})
-
-# Добавление курса
-@login_required
-def add_course(request):
-    if request.user.role != 'teacher':
-        raise PermissionDenied("Только преподаватели могут добавлять курсы.")
-    
-    if request.method == "POST":
-        form = CourseForm(request.POST)
-        if form.is_valid():
-            course = form.save(commit=False)
-            course.teacher = request.user
-            course.save()
-            return redirect('online_courses:manage_courses')
-    else:
-        form = CourseForm()
-    
-    return render(request, 'online_courses/courses/add_course.html', {'form': form})
 
 # Прохождение теста
 @login_required
@@ -161,14 +134,6 @@ def review_homework(request, homework_id):
     return render(request, 'review_homework.html', {'submissions': submissions})
 
 @login_required
-def manage_courses(request):
-    if request.user.role != 'teacher':
-        raise PermissionDenied("Только преподаватели могут управлять курсами.")
-    
-    courses = Course.objects.filter(teacher=request.user)
-    return render(request, 'manage_courses.html', {'courses': courses})
-
-@login_required
 def add_course(request):
     if request.user.role != 'teacher':
         raise PermissionDenied("Только преподаватели могут добавлять курсы.")
@@ -176,11 +141,12 @@ def add_course(request):
     if request.method == "POST":
         form = CourseForm(request.POST)
         if form.is_valid():
-            course = form.save(commit=False)
-            course.teacher = request.user 
-            course.save() 
-            form.save_m2m() 
-            return redirect('online_courses:manage_courses')
+            course = form.save(commit=False)  # Create the Course object but don't save it yet
+            course.teacher = request.user  # Set the teacher to the current user
+            course.save()  # Save the Course object to the database
+            form.save_m2m()  # Save the many-to-many data for the form
+            course.students.add(request.user)  # Add the teacher to the students many-to-many field
+            return redirect('online_courses:manage_courses')  # Redirect to the manage courses page
     else:
         form = CourseForm()
 
@@ -195,3 +161,14 @@ def delete_course(request, course_id):
 
     course.delete()
     return redirect('online_courses:manage_courses')
+
+@login_required
+def manage_courses(request):
+    if request.user.role != 'teacher':
+        raise PermissionDenied("Только преподаватели могут управлять курсами.")
+    
+    courses = Course.objects.filter(teacher=request.user)
+    return render(request, 'manage_courses.html', {'courses': courses})
+
+def account(request):
+    return render(request, 'account.html')

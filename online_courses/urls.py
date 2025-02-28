@@ -18,7 +18,9 @@ urlpatterns = [
     path('courses/manage/', manage_courses, name='manage_courses'),
     path('courses/add/', add_course, name='add_course'),
     path('courses/delete/<int:course_id>/', delete_course, name='delete_course'),
-
+    path('manage_courses/', manage_courses, name='manage_courses'),
+    path('add_course/', add_course, name='add_course'),
+    path('account/', account, name='account'),
     # Прохождение тестов                                                        
     path('quiz/<int:quiz_id>/', take_quiz, name='take_quiz'),
 

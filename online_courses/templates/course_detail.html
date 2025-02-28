@@ -7,7 +7,7 @@
 <p>{{ course.description }}</p>
 
 {% if user not in course.students.all %}
-    <a href="{% url 'enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
+    <a href="{% url 'online_courses:enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
 {% endif %}
 
 <h3>Модули и уроки</h3>

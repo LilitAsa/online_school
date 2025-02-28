@@ -7,7 +7,7 @@
 <p>Выберите курс для изучения:</p>
 <ul>
     {% for course in courses %}
-        <li><a href="{% url 'course_detail' course.id %}">{{ course.title }}</a></li>
+        <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

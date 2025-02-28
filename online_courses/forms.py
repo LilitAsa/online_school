@@ -48,16 +48,20 @@ class UserLoginForm(forms.Form):
 class UserLogoutForm(forms.Form):
     pass
 
-
 class CourseForm(forms.ModelForm):
+    students = forms.ModelMultipleChoiceField(
+        queryset=Course.students.field.related_model.objects.all(),
+        required=False,  
+        widget=forms.CheckboxSelectMultiple
+    )
+
     class Meta:
         model = Course
-        fields = ['title', 'description'] 
+        fields = ['title', 'description', 'students'] 
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
         }
-
 
 class LessonForm(forms.ModelForm):
     class Meta:

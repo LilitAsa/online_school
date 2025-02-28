@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ quiz.title }}</h2>
+  <p><strong>Описание:</strong> {{ quiz.description }}</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    {% for question in questions %}
+      <fieldset>
+        <legend>{{ question.text }}</legend>
+        {% for choice in question.get_choices %}
+          <label>
+            <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
+            {{ choice }}
+          </label><br>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+    
+    <button type="submit">Отправить ответы</button>
+  </form>
+{% endblock %}
