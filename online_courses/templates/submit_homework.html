@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Отправка домашнего задания{% endblock %}
+
+{% block content %}
+<h1>{{ homework.title }}</h1>
+<p>{{ homework.description }}</p>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="submission_text" rows="5" class="form-control"></textarea>
+    <button type="submit" class="btn btn-success mt-2">Отправить</button>
+</form>
+{% endblock %}

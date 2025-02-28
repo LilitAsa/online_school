@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ course.title }}</h1>
+<p>{{ course.description }}</p>
+
+{% if user not in course.students.all %}
+    <a href="{% url 'enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
+{% endif %}
+
+<h3>Модули и уроки</h3>
+<ul>
+    {% for module in course.module_set.all %}
+        <li><strong>{{ module.title }}</strong>
+            <ul>
+                {% for lesson in module.lesson_set.all %}
+                    <li>{{ lesson.title }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% empty %}
+        <p>Пока нет уроков.</p>
+    {% endfor %}
+</ul>
+{% endblock %}
