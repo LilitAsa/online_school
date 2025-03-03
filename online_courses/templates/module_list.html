@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+    <h1>Модули и уроки ({{ course.module_set.count }})</h1>
+    <p>Всего уроков: {{ course.lesson_set.count }}</p>
+{% endblock %}
+    

@@ -5,6 +5,7 @@
 {% block content %}
 <h1>Добро пожаловать на учебную платформу!</h1>
 <p>Выберите курс для изучения:</p>
+<p>Количество курсов: {{ courses|length }}</p>
 <ul>
     {% for course in courses %}
         <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>

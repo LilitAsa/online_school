@@ -3,21 +3,18 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from .models import Course, Enrollment, Lesson, Quiz, Question, StudentAnswer, Homework, HomeworkSubmission
-from .forms import CourseForm, LessonForm, QuizForm, QuestionForm, CustomUserCreationForm
+from .models import *
+from .forms import *
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
 
 # Главная страница
 def home(request):
-    courses = Course.objects.all()
-    return render(request, 'home.html', {'courses': courses})
+    courses = Course.objects.all()  
+    return render(request, 'home.html', {'courses': courses})  
 
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -27,7 +24,7 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("home")
+            return redirect("online_courses:home")
     else:
         form = AuthenticationForm()
     return render(request, "login.html", {"form": form})
@@ -62,15 +59,27 @@ def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     return render(request, 'course_detail.html', {'course': course})
 
+# Modules
+@login_required
+def module_list(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    return render(request, 'module_list.html', {'course': course})
+
 # Запись студента на курс
 @login_required
 def enroll_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
+    
     if request.user.role != 'student':
         raise PermissionDenied("Только студенты могут записываться на курсы.")
     
-    Enrollment.objects.get_or_create(user=request.user, course=course)
-    return redirect('online_courses:course_detail', course_id=course.id)
+    if request.method == "POST":
+        Enrollment.objects.get_or_create(user=request.user, course=course)
+        return redirect('online_courses:course_detail', course_id=course.id)
+    
+    course.students.add(request.user)
+
+    return render(request, 'enroll_course.html', {'course': course})
 
 # Прохождение теста
 @login_required

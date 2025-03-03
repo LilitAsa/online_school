@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from ordered_model.models import OrderedModel
 
 # Пользователь с ролями
 class User(AbstractUser):
@@ -16,9 +17,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+# Курс
 class Course(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'teacher'}, related_name='courses_taught')
     students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True, limit_choices_to={'role': 'student'})
      
@@ -36,7 +38,8 @@ class Course(models.Model):
     
     def __str__(self):
         return f"{self.title} (Teacher: {self.teacher.username if self.teacher else 'None'})"
-    
+
+# Прогресс студента по курсу
 class Progress(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='progress')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='progress')
@@ -53,13 +56,17 @@ class Progress(models.Model):
 
 # Модуль курса
 class Module(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=200)
     order = models.PositiveIntegerField()
+    order_with_respect_to = 'course'  # Сортировка только внутри курса
+    
+    class Meta:
+        ordering = ['order']
     
     def __str__(self):
         return f"{self.title} (Course: {self.course.title})"
-
+    
 # Урок
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
@@ -94,6 +101,7 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.user.username} on {self.course.title}"
 
+# Квиз
 class Quiz(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -102,6 +110,7 @@ class Quiz(models.Model):
     def __str__(self):
         return self.title
 
+# Вопрос к квизу
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
@@ -114,6 +123,7 @@ class Question(models.Model):
     def __str__(self):
         return f"{self.text} (Quiz: {self.quiz.title})"
 
+# Ответ студента на вопрос к квизу
 class StudentAnswer(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
@@ -124,6 +134,7 @@ class StudentAnswer(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.question.text} ({'Correct' if self.is_correct else 'Incorrect'})"
 
+# Домашняя работа
 class Homework(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -132,6 +143,7 @@ class Homework(models.Model):
     def __str__(self):
         return self.title
 
+# Подача домашней работы
 class HomeworkSubmission(models.Model):
     homework = models.ForeignKey(Homework, on_delete=models.CASCADE)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -141,3 +153,9 @@ class HomeworkSubmission(models.Model):
     
     def __str__(self):
         return f"{self.student.username} - {self.homework.title}"
+    
+    def save(self, *args, **kwargs):
+        if not self.grade:
+            # Если оценка не указана, то автоматически считаем, что она 0
+            self.grade = 0
+        super().save(*args, **kwargs)

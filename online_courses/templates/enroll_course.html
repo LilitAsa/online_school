@@ -6,7 +6,7 @@
     <p><strong>Описание:</strong> {{ course.description }}</p>
     <p><strong>Преподаватель:</strong> {{ course.teacher }}</p>
 
-    <form method="post">
+    <form method="post" action="{% url 'online_courses:enroll_course' course.id %}">
         {% csrf_token %}
         <button type="submit">Записаться</button>
     </form>
