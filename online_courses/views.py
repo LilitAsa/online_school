@@ -151,22 +151,21 @@ def submit_homework(request, homework_id):
     return render(request, 'submit_homework.html', {'homework': homework})
 
 # Проверка домашних заданий
+
+
 @login_required
-def review_homework(request, homework_id):
-    if request.user.role != 'teacher':
-        return redirect('index')
+def review_homework(request, submission_id):
+    submission = get_object_or_404(HomeworkSubmission, id=submission_id)
 
-    submissions = HomeworkSubmission.objects.filter(homework_id=homework_id)
+    if request.method == "POST":
+        form = ReviewHomeworkForm(request.POST, instance=submission)
+        if form.is_valid():
+            form.save()
+            return redirect('online_courses:manage_courses')  # Перенаправляем на список курсов
+    else:
+        form = ReviewHomeworkForm(instance=submission)
 
-    if request.method == 'POST':
-        submission_id = request.POST.get('submission_id')
-        grade = request.POST.get('grade')
-        submission = HomeworkSubmission.objects.get(id=submission_id)
-        submission.grade = grade
-        submission.save()
-        return redirect('online_courses:review_homework', homework_id=homework_id)
-
-    return render(request, 'review_homework.html', {'submissions': submissions})
+    return render(request, 'review_homework.html', {'form': form, 'submission': submission})
 
 @login_required
 def add_course(request):

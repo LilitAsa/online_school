@@ -4,18 +4,30 @@
 
 {% block content %}
 <h1>Проверка домашнего задания</h1>
-<ul>
-    {% for submission in submissions %}
+
+{% if submission %}
+    <ul>
         <li>
             <p><strong>Студент:</strong> {{ submission.student.username }}</p>
             <p><strong>Ответ:</strong> {{ submission.submission_text }}</p>
-            <form method="post">
+            <p><strong>Задание:</strong> {{ submission.homework.title }}</p>
+            
+            {% if submission.file %}
+                <p><strong>Файл:</strong> <a href="{{ submission.file.url }}">Скачать</a></p>
+            {% else %}
+                <p><strong>Файл:</strong> Не загружен</p>
+            {% endif %}
+            
+            <p><strong>Отправлено:</strong> {{ submission.submitted_at }}</p>
+            
+            <form method="post" action="{% url 'online_courses:review_homework' submission.id %}">
                 {% csrf_token %}
-                <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                <input type="number" name="grade" class="form-control" placeholder="Оценка">
+                <input type="number" name="grade" class="form-control" placeholder="Оценка" min="0" max="100" required>
                 <button type="submit" class="btn btn-primary mt-2">Оценить</button>
             </form>
         </li>
-    {% endfor %}
-</ul>
+    </ul>
+{% else %}
+    <p>Нет отправленных домашних заданий для проверки.</p>
+{% endif %}
 {% endblock %}

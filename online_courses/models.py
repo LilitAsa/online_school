@@ -138,7 +138,6 @@ class StudentAnswer(models.Model):
 
 # Домашняя работа
 
-
 class Homework(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -149,20 +148,20 @@ class Homework(models.Model):
 
     def __str__(self):
         return self.title
-
-# Подача домашней работы
 class HomeworkSubmission(models.Model):
-    homework = models.ForeignKey(Homework, on_delete=models.CASCADE)
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
-    submission_text = models.TextField()
-    file_submission = models.FileField(upload_to='homework_submissions/', blank=True, null=True)
-    grade = models.IntegerField(null=True, blank=True)  # Оценка (если уже проверено)
-    
+    STATUS_CHOICES = [
+        ('pending', 'На проверке'),
+        ('approved', 'Принято'),
+        ('rejected', 'Отклонено'),
+    ]
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    homework = models.ForeignKey(Homework, on_delete=models.CASCADE, related_name='submissions')
+    file_submission = models.FileField(upload_to='submissions/', blank=True, null=True)
+    submission_text = models.TextField(blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    grade = models.PositiveIntegerField(null=True, blank=True)  # Оценка (по желанию)
+
     def __str__(self):
         return f"{self.student.username} - {self.homework.title}"
-    
-    def save(self, *args, **kwargs):
-        if not self.grade:
-            # Если оценка не указана, то автоматически считаем, что она 0
-            self.grade = 0
-        super().save(*args, **kwargs)

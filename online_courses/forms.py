@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Lesson,Homework, Quiz, Question
+from .models import *
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -86,6 +86,15 @@ class HomeworkForm(forms.ModelForm):
             'course': forms.Select(attrs={'class': 'form-control'}),
             'due_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'assigned_to': forms.Select(attrs={'class': 'form-control'}),
+        }      
+
+class ReviewHomeworkForm(forms.ModelForm):
+    class Meta:
+        model = HomeworkSubmission
+        fields = ['status', 'grade']
+        labels = {
+            'status': 'Статус',
+            'grade': 'Оценка (по желанию)',
         }
 class QuizForm(forms.ModelForm):
     class Meta:
