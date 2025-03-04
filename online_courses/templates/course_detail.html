@@ -21,7 +21,7 @@
         <li><strong>{{ module.title }}</strong>
             <ul>
                 {% for lesson in module.lesson_set.all %}
-                    <a href="{% url 'online_courses:lesson_detail' lesson.id %}"><li>{{ lesson.title }}</li></a>
+                    <li><a href="{% url 'online_courses:lesson_detail' course.id lesson.id %}">{{ lesson.title }}</a></li>
                 {% empty %}
                     <li>Нет уроков</li>
                 {% endfor %}

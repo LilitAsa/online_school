@@ -128,3 +128,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'online_courses.User'
 
+LOGIN_URL = 'online_courses:login'
+LOGIN_REDIRECT_URL = 'online_courses:home'
+LOGOUT_REDIRECT_URL = 'online_courses:home'
+
