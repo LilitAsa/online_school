@@ -35,6 +35,9 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+        
+    def total_lessons(self):
+        return Lesson.objects.filter(module__course=self).count()
     
     def __str__(self):
         return f"{self.title} (Teacher: {self.teacher.username if self.teacher else 'None'})"
@@ -59,10 +62,9 @@ class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=200)
     order = models.PositiveIntegerField()
-    order_with_respect_to = 'course'  # Сортировка только внутри курса
-    
+
     class Meta:
-        ordering = ['order']
+        ordering = ['course', 'order']
     
     def __str__(self):
         return f"{self.title} (Course: {self.course.title})"
@@ -138,8 +140,8 @@ class StudentAnswer(models.Model):
 class Homework(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    
+    description = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return self.title
 

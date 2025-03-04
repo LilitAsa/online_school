@@ -65,6 +65,12 @@ def module_list(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     return render(request, 'module_list.html', {'course': course})
 
+# Lesson details
+@login_required
+def lesson_detail(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    return render(request, 'lesson_detail.html', {'lesson': lesson})
+
 # Запись студента на курс
 @login_required
 def enroll_course(request, course_id):

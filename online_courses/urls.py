@@ -12,7 +12,9 @@ urlpatterns = [
     # Курсы
     path('courses/', course_list, name='course_list'),
     path('course/<int:course_id>/', course_detail, name='course_detail'),
-    path('course/<int:course_id>/enroll/', enroll_course, name='enroll_course'),
+    path('course/<int:course_id>/modules/', module_list, name='module_list'),
+    path('course/<int:lesson_id>/detail/', lesson_detail, name='lesson_detail'),
+    path('course/<int:lesson_id>/enroll/', enroll_course, name='enroll_course'),
 
     # Управление курсами (только для преподавателей)
     path('courses/manage/', manage_courses, name='manage_courses'),
@@ -20,7 +22,6 @@ urlpatterns = [
     path('courses/delete/<int:course_id>/', delete_course, name='delete_course'),
     path('manage_courses/', manage_courses, name='manage_courses'),
     path('add_course/', add_course, name='add_course'),
-    path('account/', account, name='account'),
     # Прохождение тестов                                                        
     path('quiz/<int:quiz_id>/', take_quiz, name='take_quiz'),
 
