@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Lesson, Quiz, Question
+from .models import Course, Lesson,Homework, Quiz, Question
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -74,8 +74,19 @@ class LessonForm(forms.ModelForm):
             'video_url': forms.URLInput(attrs={'class': 'form-control'}),
             'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }   
-        
 
+
+class HomeworkForm(forms.ModelForm):
+    class Meta:
+        model = Homework
+        fields = ['title', 'description', 'course', 'due_date', 'assigned_to']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'course': forms.Select(attrs={'class': 'form-control'}),
+            'due_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'assigned_to': forms.Select(attrs={'class': 'form-control'}),
+        }
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz

@@ -4,7 +4,6 @@
 
 {% block content %}
 <h1>Добро пожаловать на учебную платформу!</h1>
-<p>{{}}</p>
 <p>Выберите курс для изучения:</p>
 <p>Количество курсов: {{ courses|length }}</p>
 <ul>
@@ -12,4 +11,20 @@
         <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>
     {% endfor %}
 </ul>
+
+<hr>
+
+<h2>Домашние задания</h2>
+<p>Количество домашних заданий: {{ homeworks|length }}</p>
+<ul>
+    {% for homework in homeworks %}
+        <li><a href="{% url 'online_courses:review_homework' homework.id %}">{{ homework.title }}</a></li>
+    {% endfor %}
+</ul>
+
+{% if user.role == 'teacher' %}
+    <hr>
+    <h2>Добавить домашнее задание</h2>
+    <p><a href="{% url 'online_courses:add_homework' %}" class="btn btn-primary">Добавить домашнее задание</a></p>
+{% endif %}
 {% endblock %}

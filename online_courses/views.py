@@ -12,9 +12,9 @@ from django.contrib.auth import get_user_model
 
 # Главная страница
 def home(request):
-    courses = Course.objects.all()  
-    return render(request, 'home.html', {'courses': courses})  
-
+    courses = Course.objects.all()
+    homeworks = Homework.objects.all()
+    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks})
 
 User = get_user_model()
 
@@ -87,6 +87,25 @@ def enroll_course(request, course_id):
     course.students.add(request.user)
 
     return render(request, 'enroll_course.html', {'course': course})
+
+
+@login_required
+def add_homework(request):
+    if request.user.role != 'teacher':
+        raise PermissionDenied("Только преподаватели могут добавлять домашние задания.")
+    
+    if request.method == 'POST':
+        form = HomeworkForm(request.POST)
+        if form.is_valid():
+            homework = form.save(commit=False)
+            homework.assigned_by = request.user
+            homework.save()
+            return redirect('online_courses:home')
+    else:
+        form = HomeworkForm()
+    
+    
+    return render(request, 'add_homework.html', {'form': form})
 
 # Прохождение теста
 @login_required

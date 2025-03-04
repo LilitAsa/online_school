@@ -137,10 +137,15 @@ class StudentAnswer(models.Model):
         return f"{self.student.username} - {self.question.text} ({'Correct' if self.is_correct else 'Incorrect'})"
 
 # Домашняя работа
+
+
 class Homework(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='homeworks')
+    due_date = models.DateField()
+    assigned_by = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='assigned_homeworks')
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='homeworks', blank=True, null=True)
 
     def __str__(self):
         return self.title

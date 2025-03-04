@@ -5,4 +5,7 @@
 {% block content %}
 <h1>{{ lesson.title }}</h1>
 <p>{{ lesson.content }}</p>
+
+<p><a href="{% url 'online_courses:course_detail' course.id %}">Back to course</a></p>
+
 {% endblock %}
