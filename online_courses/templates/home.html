@@ -4,11 +4,12 @@
 
 {% block content %}
 <h1>Добро пожаловать на учебную платформу!</h1>
+<p>Привет, {{ user.username }}!</p>
 <p>Выберите курс для изучения:</p>
 <p>Количество курсов: {{ courses|length }}</p>
 <ul>
     {% for course in courses %}
-        <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>
+        <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }} - учитель: {{ course.teacher }}</a></li>
     {% endfor %}
 </ul>
 

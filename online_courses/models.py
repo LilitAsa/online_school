@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from ordered_model.models import OrderedModel
 
 # Пользователь с ролями
 class User(AbstractUser):
@@ -125,6 +124,14 @@ class Question(models.Model):
     def __str__(self):
         return f"{self.text} (Quiz: {self.quiz.title})"
 
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
+    text = models.CharField(max_length=255)
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.text} ({'Correct' if self.is_correct else 'Wrong'})"
+
 # Ответ студента на вопрос к квизу
 class StudentAnswer(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -137,7 +144,6 @@ class StudentAnswer(models.Model):
         return f"{self.student.username} - {self.question.text} ({'Correct' if self.is_correct else 'Incorrect'})"
 
 # Домашняя работа
-
 class Homework(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)

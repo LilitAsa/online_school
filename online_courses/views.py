@@ -5,9 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
-from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from rest_framework import viewsets
+from .models import Quiz, Question, Answer, StudentAnswer
+from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, StudentAnswerSerializer
 
 
 # Главная страница
@@ -206,3 +208,19 @@ def manage_courses(request):
 
 def account(request):
     return render(request, 'account.html')
+
+class QuizViewSet(viewsets.ModelViewSet):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+class AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+
+class StudentAnswerViewSet(viewsets.ModelViewSet):
+    queryset = StudentAnswer.objects.all()
+    serializer_class = StudentAnswerSerializer
