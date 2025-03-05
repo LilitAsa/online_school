@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotFound
 from .models import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
@@ -157,7 +158,10 @@ def submit_homework(request, homework_id):
 
 @login_required
 def review_homework(request, submission_id):
-    submission = get_object_or_404(HomeworkSubmission, id=submission_id)
+    submission = HomeworkSubmission.objects.filter(id=submission_id).first()
+
+    if not submission:
+        return HttpResponseNotFound("HomeworkSubmission not found.")
 
     if request.method == "POST":
         form = ReviewHomeworkForm(request.POST, instance=submission)
@@ -168,7 +172,6 @@ def review_homework(request, submission_id):
         form = ReviewHomeworkForm(instance=submission)
 
     return render(request, 'review_homework.html', {'form': form, 'submission': submission})
-
 @login_required
 def add_course(request):
     if request.user.role != 'teacher':
