@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
+from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
@@ -163,15 +164,20 @@ def review_homework(request, submission_id):
     if not submission:
         return HttpResponseNotFound("HomeworkSubmission not found.")
 
+    # # Check if the user is a teacher
+    # if not hasattr(request.user, 'role') or request.user.role != 'teacher':
+    #     raise PermissionDenied("You do not have permission to review this homework.")
+
     if request.method == "POST":
         form = ReviewHomeworkForm(request.POST, instance=submission)
         if form.is_valid():
             form.save()
-            return redirect('online_courses:manage_courses')  # Перенаправляем на список курсов
+            return redirect('online_courses:manage_courses')  # Redirect to the course management page
     else:
         form = ReviewHomeworkForm(instance=submission)
 
     return render(request, 'review_homework.html', {'form': form, 'submission': submission})
+
 @login_required
 def add_course(request):
     if request.user.role != 'teacher':

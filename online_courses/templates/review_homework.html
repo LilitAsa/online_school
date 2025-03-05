@@ -11,6 +11,7 @@
             <p><strong>Студент:</strong> {{ submission.student.username }}</p>
             <p><strong>Ответ:</strong> {{ submission.submission_text }}</p>
             <p><strong>Задание:</strong> {{ submission.homework.title }}</p>
+            <p><strong>Оценка:</strong> {{ submission.grade }}</p>
             
             {% if submission.file %}
                 <p><strong>Файл:</strong> <a href="{{ submission.file.url }}">Скачать</a></p>
@@ -20,11 +21,15 @@
             
             <p><strong>Отправлено:</strong> {{ submission.submitted_at }}</p>
             
-            <form method="post" action="{% url 'online_courses:review_homework' submission.id %}">
-                {% csrf_token %}
-                <input type="number" name="grade" class="form-control" placeholder="Оценка" min="0" max="100" required>
-                <button type="submit" class="btn btn-primary mt-2">Оценить</button>
-            </form>
+            {% if request.user.role == 'teacher' %}
+                <form method="post" action="{% url 'online_courses:review_homework' submission.id %}">
+                    {% csrf_token %}
+                    <input type="number" name="grade" class="form-control" placeholder="Оценка" min="0" max="100" required>
+                    <button type="submit" class="btn btn-primary mt-2">Оценить</button>
+                </form>
+            {% else %}
+                <p>Только преподаватель может оценить домашнее задание.</p>
+            {% endif %}
         </li>
     </ul>
 {% else %}
