@@ -28,6 +28,14 @@ class QuizAdmin(admin.ModelAdmin):
     search_fields = ('title', 'lesson__title')  
     list_filter = ('lesson',)
 
+class HomeworkAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs  # Админ видит все
+        return qs.filter(course__teacher=request.user)  # Учитель видит только свои
+
+# admin.site.register(Homework, HomeworkAdmin)
 admin.site.register(User)
 admin.site.register(Question)
 admin.site.register(StudentAnswer)

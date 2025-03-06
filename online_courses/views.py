@@ -9,9 +9,7 @@ from .models import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
 from .models import Quiz, Question, Answer, StudentAnswer
-from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, StudentAnswerSerializer
 
 
 # Главная страница
@@ -155,18 +153,15 @@ def submit_homework(request, homework_id):
     return render(request, 'submit_homework.html', {'homework': homework})
 
 # Проверка домашних заданий
-
-
-@login_required
 def review_homework(request, submission_id):
     submission = HomeworkSubmission.objects.filter(id=submission_id).first()
 
     if not submission:
         return HttpResponseNotFound("HomeworkSubmission not found.")
 
-    # # Check if the user is a teacher
-    # if not hasattr(request.user, 'role') or request.user.role != 'teacher':
-    #     raise PermissionDenied("You do not have permission to review this homework.")
+    # Check if the user is a teacher
+    if not hasattr(request.user, 'role') or request.user.role != 'teacher':
+        raise PermissionDenied("You do not have permission to review this homework.")
 
     if request.method == "POST":
         form = ReviewHomeworkForm(request.POST, instance=submission)
@@ -217,19 +212,3 @@ def manage_courses(request):
 
 def account(request):
     return render(request, 'account.html')
-
-class QuizViewSet(viewsets.ModelViewSet):
-    queryset = Quiz.objects.all()
-    serializer_class = QuizSerializer
-
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-
-class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
-
-class StudentAnswerViewSet(viewsets.ModelViewSet):
-    queryset = StudentAnswer.objects.all()
-    serializer_class = StudentAnswerSerializer

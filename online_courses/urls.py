@@ -1,15 +1,7 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 from .views import *
 
 app_name = 'online_courses'
-
-router = DefaultRouter()
-router.register(r'quizzes', QuizViewSet)
-router.register(r'questions', QuestionViewSet)
-router.register(r'answers', AnswerViewSet)
-router.register(r'student-answers', StudentAnswerViewSet)
-
 
 urlpatterns = [
     path('', home, name='home'),
@@ -38,6 +30,4 @@ urlpatterns = [
     
     # Прохождение тестов
     path('quiz/<int:quiz_id>/', take_quiz, name='take_quiz'),
-    
-    path('api/', include(router.urls)),
 ]

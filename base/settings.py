@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'online_courses',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -132,10 +131,3 @@ AUTH_USER_MODEL = 'online_courses.User'
 LOGIN_URL = 'online_courses:login'
 LOGIN_REDIRECT_URL = 'online_courses:home'
 LOGOUT_REDIRECT_URL = 'online_courses:home'
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
-}
-
