@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Студенческая панель{% endblock %}
+
+{% block content %}
+<h1>Студенческая панель</h1>
+
+{% if assignments %}
+    <ul>
+        {% for assignment in assignments %}
+            <li>
+                <p><strong>Курс:</strong> {{ assignment.course.title }}</p>
+                <p><strong>Задание:</strong> {{ assignment.title }}</p>
+                <p><strong>Описание:</strong> {{ assignment.description }}</p>
+                <p><strong>Срок сдачи:</strong> {{ assignment.due_date }}</p>
+                <a href="{% url 'online_courses:submit_homework' assignment.id %}" class="btn btn-primary">Отправить домашнее задание</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет заданий для выполнения.</p>
+{% endif %}
+{% endblock %}

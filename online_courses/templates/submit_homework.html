@@ -3,11 +3,14 @@
 {% block title %}Отправка домашнего задания{% endblock %}
 
 {% block content %}
-<h1>{{ homework.title }}</h1>
-<p>{{ homework.description }}</p>
+<h1>Отправка домашнего задания</h1>
+
 <form method="post">
     {% csrf_token %}
-    <textarea name="submission_text" rows="5" class="form-control"></textarea>
-    <button type="submit" class="btn btn-success mt-2">Отправить</button>
+    <div class="form-group">
+        <label for="submission_text">Ответ:</label>
+        <textarea name="submission_text" id="submission_text" class="form-control" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Отправить</button>
 </form>
 {% endblock %}

@@ -27,5 +27,9 @@
     <hr>
     <h2>Добавить домашнее задание</h2>
     <p><a href="{% url 'online_courses:add_homework' %}" class="btn btn-primary">Добавить домашнее задание</a></p>
+{% elif user.role == 'student' %}
+    <hr>
+    <h2>Студенческая панель</h2>
+    <p><a href="{% url 'online_courses:student_dashboard' %}" class="btn btn-primary">Перейти в студенческую панель</a></p>
 {% endif %}
 {% endblock %}

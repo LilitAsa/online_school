@@ -27,7 +27,10 @@ urlpatterns = [
     path('homework/add/', add_homework, name='add_homework'),
     path('homework/<int:homework_id>/submit/', submit_homework, name='submit_homework'),
     path('homework/<int:submission_id>/review/', review_homework, name='review_homework'),
-    
+      
+    # Студенческая панель
+    path('student_dashboard/', student_dashboard, name='student_dashboard'),
+        
     # Прохождение тестов
     path('quiz/<int:quiz_id>/', take_quiz, name='take_quiz'),
 ]

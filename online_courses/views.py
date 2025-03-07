@@ -23,11 +23,22 @@ User = get_user_model()
 
 def user_login(request):
     if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect("online_courses:home")
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"Вы вошли как {username}.")
+                if user.role == 'student':
+                    return redirect('online_courses:student_dashboard')
+                else:
+                    return redirect('online_courses:home')
+            else:
+                messages.error(request, "Неверное имя пользователя или пароль.")
+        else:
+            messages.error(request, "Неверное имя пользователя или пароль.")
     else:
         form = AuthenticationForm()
     return render(request, "login.html", {"form": form})
@@ -142,6 +153,9 @@ def take_quiz(request, quiz_id):
 def submit_homework(request, homework_id):
     homework = get_object_or_404(Homework, id=homework_id)
 
+    if request.user.role != 'student':
+        raise PermissionDenied("Только студенты могут отправлять домашние задания.")
+
     if request.method == 'POST':
         submission_text = request.POST.get('submission_text')
         HomeworkSubmission.objects.create(
@@ -149,7 +163,8 @@ def submit_homework(request, homework_id):
             student=request.user,
             submission_text=submission_text
         )
-        return redirect('student_dashboard')
+        messages.success(request, "Домашнее задание успешно отправлено.")
+        return redirect('online_courses:student_dashboard')
 
     return render(request, 'submit_homework.html', {'homework': homework})
 
@@ -220,3 +235,13 @@ def manage_courses(request):
 
 def account(request):
     return render(request, 'account.html')
+
+@login_required
+def student_dashboard(request):
+    if request.user.role != 'student':
+        raise PermissionDenied("Только студенты могут просматривать эту страницу.")
+
+    # Get the list of assignments for the student
+    assignments = Homework.objects.filter(course__students=request.user)
+
+    return render(request, 'student_dashboard.html', {'assignments': assignments})
