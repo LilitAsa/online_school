@@ -1,0 +1,91 @@
+/* Custom styles for hover effects */
+.list-group-item-action:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.text-decoration-none:hover {
+  text-decoration: underline;
+}
+
+/* Additional custom styles */
+body {
+  font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+.container {
+  margin-top: 20px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+/* Styles for student_dashboard */
+.student-dashboard {
+  background-color: #f1f1f1;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.student-dashboard h2 {
+  color: #007bff;
+}
+
+.student-dashboard .list-group-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+.student-dashboard .list-group-item:hover {
+  background-color: #e9ecef;
+}
+
+/* Styles for quiz_result */
+.quiz-result {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.quiz-result h1 {
+  font-size: 2.5rem;
+  color: #28a745;
+}
+
+.quiz-result .btn-primary {
+  margin-top: 20px;
+}
+
+/* Styles for unordered lists */
+/* ul {
+  list-style-type: none; 
+  padding: 0;
+ 
+  li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: #007bff;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+} */ 

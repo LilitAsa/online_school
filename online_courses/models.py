@@ -47,7 +47,8 @@ class Progress(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='progress')
     lesson = models.ForeignKey('Lesson', on_delete=models.SET_NULL, blank=True, null=True)
     progress_percentage = models.FloatField(default=0.0)
-
+    cover_photo = models.ImageField(upload_to="cover/", null=True, blank=True)
+    
     def clean(self):
         if self.student.role != 'student':
             raise ValidationError("Only students can have progress records.")
@@ -105,6 +106,7 @@ class Review(models.Model):
 # Квиз
 class Quiz(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     
@@ -132,12 +134,20 @@ class Answer(models.Model):
     def __str__(self):
         return f"{self.text} ({'Correct' if self.is_correct else 'Wrong'})"
 
+class QuizResult(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    score = models.IntegerField()
+    
+    def __str__(self):
+        return self.title
+
 # Ответ студента на вопрос к квизу
 class StudentAnswer(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    selected_answer = models.CharField(max_length=255)
+    selected_answer = models.CharField(max_length=255,null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     
     def __str__(self):

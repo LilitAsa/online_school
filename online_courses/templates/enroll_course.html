@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="enroll-course">
     <h2>Запись на курс: {{ course.title }}</h2>
 
     <p><strong>Описание:</strong> {{ course.description }}</p>
@@ -12,4 +13,5 @@
     </form>
 
     <a href="{% url 'online_courses:course_list' %}">Вернуться к курсам</a>
+</div>
 {% endblock %}

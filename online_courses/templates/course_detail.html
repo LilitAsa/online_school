@@ -3,8 +3,12 @@
 {% block title %}{{ course.title }}{% endblock %}
 
 {% block content %}
-<h1>{{ course.title }}</h1>
-<p>{{ course.description }}</p>
+<div class="course-detail">
+    <h1>{{ course.title }}</h1>
+    <p><strong>Описание:</strong> {{ course.description }}</p>
+    <p><strong>Учитель:</strong> {{ course.teacher }}</p>
+    <a href="{% url 'online_courses:enroll_course' course.id %}" class="btn btn-primary">Записаться на курс</a>
+</div>
 
 {% if user not in course.students.all %}
     <a href="{% url 'online_courses:enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
@@ -16,7 +20,7 @@
 <p>Всего уроков: {{ course.modules.all|length }}</p>
 <p>Всего модулей: {{ course.modules.count }}</p>
 
-<ul>
+<ul class="modules">
     {% for module in course.modules.all %}
         <li><strong>{{ module.title }}</strong>
             <ul>

@@ -1,24 +1,28 @@
 {% extends 'base.html' %}
 
+{% block title %}Прохождение теста{% endblock %}
+
 {% block content %}
-  <h2>{{ quiz.title }}</h2>
-  <p><strong>Описание:</strong> {{ quiz.description }}</p>
-  
-  <form method="post">
-    {% csrf_token %}
-    
-    {% for question in questions %}
-      <fieldset>
-        <legend>{{ question.text }}</legend>
-        {% for choice in question.get_choices %}
-          <label>
-            <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
-            {{ choice }}
-          </label><br>
+<div class="quiz">
+    <h2>{{ quiz.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for question in quiz.questions.all %}
+            <div class="question">
+                <h3>{{ question.text }}</h3>
+                <ul class="answers">
+                    {% for choice in question.get_choices %}
+                        <li>
+                            <label>
+                                <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
+                                {{ choice }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endfor %}
-      </fieldset>
-    {% endfor %}
-    
-    <button type="submit">Отправить ответы</button>
-  </form>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+</div>
 {% endblock %}

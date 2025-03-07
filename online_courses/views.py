@@ -127,11 +127,33 @@ def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
     questions = quiz.questions.all()
 
+    if not questions.exists():
+        messages.error(request, "Этот тест пока не содержит вопросов.")
+        return redirect('online_courses:home')
+
     if request.method == 'POST':
         correct_count = 0
+        total_questions = len(questions)
+
         for question in questions:
             selected_answer = request.POST.get(f'question_{question.id}')
             is_correct = selected_answer == question.correct_answer
+            
+            if selected_answer is not None:
+                is_correct = selected_answer == question.correct_answer
+
+                StudentAnswer.objects.create(
+                    student=request.user,
+                    question=question,
+                    selected_answer=selected_answer,
+                    is_correct=is_correct
+                )
+
+                if is_correct:
+                    correct_count += 1
+            else:
+                messages.error(request, f"Вы не выбрали ответ на вопрос: {question.text}")
+                return redirect('online_courses:take_quiz', quiz_id=quiz.id)
 
             StudentAnswer.objects.create(
                 student=request.user,
@@ -143,7 +165,15 @@ def take_quiz(request, quiz_id):
             if is_correct:
                 correct_count += 1
 
-        score_percentage = (correct_count / len(questions)) * 100
+        score_percentage = (correct_count / total_questions) * 100
+
+        # Можно добавить сохранение результата в БД
+        QuizResult.objects.create(
+            student=request.user,
+            quiz=quiz,
+            score=score_percentage
+        )
+
         return render(request, 'quiz_result.html', {'quiz': quiz, 'score': score_percentage})
 
     return render(request, 'take_quiz.html', {'quiz': quiz, 'questions': questions})
@@ -243,5 +273,6 @@ def student_dashboard(request):
 
     # Get the list of assignments for the student
     assignments = Homework.objects.filter(course__students=request.user)
+    quizzes = Quiz.objects.filter(lesson__module__course__students=request.user)
 
-    return render(request, 'student_dashboard.html', {'assignments': assignments})
+    return render(request, 'student_dashboard.html', {'assignments': assignments, 'quizzes': quizzes})

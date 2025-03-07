@@ -3,6 +3,8 @@
 {% block title %}Результат теста{% endblock %}
 
 {% block content %}
-<h1>Ваш результат: {{ score }}%</h1>
-<a href="{% url 'home' %}" class="btn btn-primary">На главную</a>
+<div class="quiz-result">
+    <h1>Ваш результат: {{ score }}%</h1>
+    <a href="{% url 'home' %}" class="btn btn-primary">На главную</a>
+</div>
 {% endblock %}

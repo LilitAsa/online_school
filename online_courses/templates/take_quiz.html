@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ quiz.title }}{% endblock %}
+{% block title %}Прохождение теста{% endblock %}
 
 {% block content %}
-<h1>{{ quiz.title }}</h1>
-<form method="post">
-    {% csrf_token %}
-    {% for question in questions %}
-        <p><strong>{{ question.text }}</strong></p>
-        <input type="text" name="question_{{ question.id }}">
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Отправить</button>
-</form>
+<div class="quiz">
+    <h2>{{ quiz.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+            <p>{{ question.text }}</p>
+            {% for choice in question.get_choices %}
+                <label>
+                    <input type="radio" name="question_{{ question.id }}" value="{{ choice }}" required>
+                    {{ choice }}
+                </label>
+            {% endfor %}
+        {% endfor %}
+        <button type="submit">Отправить</button>
+    </form>    
+</div>
 {% endblock %}
