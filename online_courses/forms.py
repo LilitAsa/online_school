@@ -32,6 +32,7 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password1'].label = 'Password'
         self.fields['password2'].label = 'Confirm Password'
 
+
 class UserLoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -48,6 +49,7 @@ class UserLoginForm(forms.Form):
 class UserLogoutForm(forms.Form):
     pass
 
+
 class CourseForm(forms.ModelForm):
     students = forms.ModelMultipleChoiceField(
         queryset=Course.students.field.related_model.objects.all(),
@@ -62,6 +64,7 @@ class CourseForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
 
 class LessonForm(forms.ModelForm):
     class Meta:
@@ -96,6 +99,13 @@ class ReviewHomeworkForm(forms.ModelForm):
             'status': 'Статус',
             'grade': 'Оценка (по желанию)',
         }
+    
+    def clean_grade(self):
+        grade = self.cleaned_data.get('grade')
+        if grade < 0 or grade > 100:
+            raise forms.ValidationError("Оценка должна быть в диапазоне от 0 до 100.")
+        return grade
+        
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz

@@ -10,6 +10,7 @@ from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Quiz, Question, Answer, StudentAnswer
+from django.contrib import messages
 
 
 # Главная страница
@@ -153,6 +154,7 @@ def submit_homework(request, homework_id):
     return render(request, 'submit_homework.html', {'homework': homework})
 
 # Проверка домашних заданий
+@login_required
 def review_homework(request, submission_id):
     submission = HomeworkSubmission.objects.filter(id=submission_id).first()
 
@@ -167,7 +169,13 @@ def review_homework(request, submission_id):
         form = ReviewHomeworkForm(request.POST, instance=submission)
         if form.is_valid():
             form.save()
-            return redirect('online_courses:manage_courses')  # Redirect to the course management page
+            if submission.status == 'rejected':
+                messages.warning(request, "Статус: Отклонена.")
+            elif submission.status == 'pending':
+                messages.warning(request, "Статус: На проверке.")
+            else:
+                messages.success(request, "Оценка успешно обновлена.")
+            return redirect('online_courses:review_homework', submission_id=submission.id)  # Redirect to the same page to see the updated grade
     else:
         form = ReviewHomeworkForm(instance=submission)
 

@@ -5,6 +5,12 @@
 {% block content %}
 <h1>Проверка домашнего задания</h1>
 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
 {% if submission %}
     <ul>
         <li>
@@ -12,6 +18,7 @@
             <p><strong>Ответ:</strong> {{ submission.submission_text }}</p>
             <p><strong>Задание:</strong> {{ submission.homework.title }}</p>
             <p><strong>Оценка:</strong> {{ submission.grade }}</p>
+            <p><strong>Оценка:</strong> {{ submission.status }}</p>
             
             {% if submission.file %}
                 <p><strong>Файл:</strong> <a href="{{ submission.file.url }}">Скачать</a></p>
@@ -24,7 +31,7 @@
             {% if request.user.role == 'teacher' %}
                 <form method="post" action="{% url 'online_courses:review_homework' submission.id %}">
                     {% csrf_token %}
-                    <input type="number" name="grade" class="form-control" placeholder="Оценка" min="0" max="100" required>
+                    {{ form.as_p }}
                     <button type="submit" class="btn btn-primary mt-2">Оценить</button>
                 </form>
             {% else %}
