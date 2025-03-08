@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="quiz-result">
-    <h1>Ваш результат: {{ score }}%</h1>
-    <a href="{% url 'home' %}" class="btn btn-primary">На главную</a>
+    <h1>Ваш результат: {{ score|floatformat:0 }}%</h1>
+    <a href="{% url 'online_courses:home' %}" class="btn btn-primary">На главную</a>
 </div>
 {% endblock %}

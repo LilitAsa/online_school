@@ -69,9 +69,10 @@ def course_list(request):
 
 # Детали курса
 @login_required
-def course_detail(request, course_id):    
+def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    return render(request, 'course_detail.html', {'course': course})
+    is_enrolled = course.students.filter(id=request.user.id).exists()
+    return render(request, 'course_detail.html', {'course': course, 'is_enrolled': is_enrolled})
 
 # Modules
 @login_required
@@ -118,7 +119,6 @@ def add_homework(request):
     else:
         form = HomeworkForm()
     
-    
     return render(request, 'add_homework.html', {'form': form})
 
 # Прохождение теста
@@ -127,57 +127,42 @@ def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
     questions = quiz.questions.all()
 
-    if not questions.exists():
-        messages.error(request, "Этот тест пока не содержит вопросов.")
-        return redirect('online_courses:home')
-
     if request.method == 'POST':
         correct_count = 0
-        total_questions = len(questions)
+        total_questions = len(questions)  # Считаем количество вопросов
 
         for question in questions:
             selected_answer = request.POST.get(f'question_{question.id}')
-            is_correct = selected_answer == question.correct_answer
             
-            if selected_answer is not None:
-                is_correct = selected_answer == question.correct_answer
-
-                StudentAnswer.objects.create(
-                    student=request.user,
-                    question=question,
-                    selected_answer=selected_answer,
-                    is_correct=is_correct
-                )
-
-                if is_correct:
-                    correct_count += 1
-            else:
-                messages.error(request, f"Вы не выбрали ответ на вопрос: {question.text}")
+            # Проверяем, что ответ был выбран
+            if selected_answer is None:
+                messages.error(request, f"Вы не ответили на вопрос: {question.text}")
                 return redirect('online_courses:take_quiz', quiz_id=quiz.id)
 
+            # Приводим к строке, если ответы сравниваются неправильно
+            correct_answer_text = str(question.correct_answer).strip().lower()
+            selected_answer_text = str(selected_answer).strip().lower()
+
+            is_correct = selected_answer_text == correct_answer_text
+
+            # Создаём объект ответа студента
             StudentAnswer.objects.create(
                 student=request.user,
+                quiz=quiz,  # Должно быть обязательно
                 question=question,
-                selected_answer=selected_answer,
+                selected_answer=selected_answer_text,
                 is_correct=is_correct
             )
 
             if is_correct:
                 correct_count += 1
 
-        score_percentage = (correct_count / total_questions) * 100
+        # Избегаем деления на 0
+        score_percentage = (correct_count / total_questions) * 100 if total_questions > 0 else 0
 
-        # Можно добавить сохранение результата в БД
-        QuizResult.objects.create(
-            student=request.user,
-            quiz=quiz,
-            score=score_percentage
-        )
-
-        return render(request, 'quiz_result.html', {'quiz': quiz, 'score': score_percentage})
+        return render(request, 'quiz_result.html', {'quiz': quiz, 'score': round(score_percentage, 2)})
 
     return render(request, 'take_quiz.html', {'quiz': quiz, 'questions': questions})
-
 # Отправка домашнего задания
 @login_required
 def submit_homework(request, homework_id):
