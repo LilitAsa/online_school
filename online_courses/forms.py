@@ -107,9 +107,14 @@ class ReviewHomeworkForm(forms.ModelForm):
         return grade
         
 class QuizForm(forms.ModelForm):
+    lesson = forms.ModelChoiceField(
+        queryset=Lesson.objects.all(),
+        required=False,
+        empty_label="Без урока"
+    )
     class Meta:
         model = Quiz
-        fields = ['lesson', 'title', 'description']
+        fields = ['title', 'description', 'lesson', 'course']
         widgets = {
             'lesson': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -120,9 +125,21 @@ class QuizForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['quiz', 'text', 'correct_answer']
+        fields = ['quiz', 'text', 'correct_answer', 'choices']
         widgets = {
             'quiz': forms.Select(attrs={'class': 'form-control'}),
             'text': forms.TextInput(attrs={'class': 'form-control'}),
             'correct_answer': forms.TextInput(attrs={'class': 'form-control'}),
         }   
+        
+
+class LessonForm(forms.ModelForm):
+    class Meta:
+        model = Lesson
+        fields = ["title", "content"]
+
+        
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ['text', 'is_correct']

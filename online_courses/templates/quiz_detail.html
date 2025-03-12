@@ -1,0 +1,10 @@
+<h2>Квиз: {{ quiz.title }}</h2>
+
+{% for question in questions %}
+    <p>{{ question.text }}</p>
+{% empty %}
+    <p>Вопросов пока нет.</p>
+{% endfor %}
+
+<a href="{% url 'online_courses:add_question' quiz.id %}" class="btn btn-primary">Добавить вопрос</a>
+<a href="{% url 'online_courses:quiz_list' %}" class="btn btn-secondary">Назад к списку квизов</a>

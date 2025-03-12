@@ -14,6 +14,7 @@ urlpatterns = [
     path('course/<int:course_id>/', course_detail, name='course_detail'),
     path('course/<int:course_id>/enroll/', enroll_course, name='enroll_course'),
     path('course/<int:course_id>/lesson/<int:lesson_id>/', lesson_detail, name='lesson_detail'),
+    path("course/<int:course_id>/add_lesson/", add_lesson, name="add_lesson"),
 
     # Управление курсами (только для преподавателей)
     path('courses/manage/', manage_courses, name='manage_courses'),
@@ -32,5 +33,9 @@ urlpatterns = [
     path('student_dashboard/', student_dashboard, name='student_dashboard'),
         
     # Прохождение тестов
-    path('quiz/<int:quiz_id>/', take_quiz, name='take_quiz'),
-]
+    path("quiz/<int:quiz_id>/", take_quiz, name="take_quiz"),    
+    path("course/<int:course_id>/add_quiz/", add_quiz, name="add_quiz"),
+    path('quiz/<int:quiz_id>/add-question/', add_question, name='add_question'), 
+    path('quiz/<int:quiz_id>/', quiz_detail, name='quiz_detail'),
+    path('quizzes/', quiz_list, name='quiz_list'),
+    ]

@@ -17,7 +17,8 @@ from django.contrib import messages
 def home(request):
     courses = Course.objects.all()
     homeworks = Homework.objects.all()
-    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks})
+    quizzes = Quiz.objects.all()
+    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks, 'quizzes':quizzes})
 
 User = get_user_model()
 
@@ -71,8 +72,14 @@ def course_list(request):
 @login_required
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
+    quizzes = course.quizzes.all()
+    is_teacher = request.user == course.teacher
     is_enrolled = course.students.filter(id=request.user.id).exists()
-    return render(request, 'course_detail.html', {'course': course, 'is_enrolled': is_enrolled})
+    
+    return render(request, 'course_detail.html', {
+        'course': course, 'is_enrolled': is_enrolled, 
+        'is_teacher': is_teacher, 'quizzes': quizzes,
+    })
 
 # Modules
 @login_required
@@ -125,7 +132,11 @@ def add_homework(request):
 @login_required
 def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    questions = quiz.questions.all()
+    questions = quiz.questions.all() 
+    is_teacher = request.user == quiz.course.teacher
+
+    if is_teacher:
+        return render(request, "quiz_detail.html", {"quiz": quiz, "questions": questions})
 
     if request.method == 'POST':
         correct_count = 0
@@ -163,6 +174,16 @@ def take_quiz(request, quiz_id):
         return render(request, 'quiz_result.html', {'quiz': quiz, 'score': round(score_percentage, 2)})
 
     return render(request, 'take_quiz.html', {'quiz': quiz, 'questions': questions})
+
+@login_required
+def quiz_detail(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    if request.user != quiz.course.teacher:
+        return redirect("home")  # Разрешено только учителям
+
+    questions = quiz.questions.all()
+    return render(request, "quiz_detail.html", {"quiz": quiz, "questions": questions})
+
 # Отправка домашнего задания
 @login_required
 def submit_homework(request, homework_id):
@@ -247,6 +268,82 @@ def manage_courses(request):
     
     courses = Course.objects.filter(teacher=request.user)
     return render(request, 'manage_courses.html', {'courses': courses})
+
+@login_required
+def add_lesson(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.user != course.teacher:
+        return redirect("home")  
+
+    if request.method == "POST":
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.course = course
+            lesson.save()
+            return redirect("course_detail", course_id=course.id)
+    else:
+        form = LessonForm()
+
+    return render(request, "add_lesson.html", {"form": form, "course": course})
+
+@login_required
+def add_quiz(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    lesson_id = request.POST.get("lesson")
+    
+    if lesson_id:
+        lesson = get_object_or_404(Lesson, id=lesson_id)
+        if lesson.course != course:
+            return redirect("home")  # Защита от подмены данных
+        quiz.lesson = lesson
+
+    if request.user != course.teacher:
+        return redirect("home")  
+
+    if request.method == "POST":
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            quiz = form.save(commit=False)
+            quiz.course = course
+
+            lesson_id = request.POST.get("lesson")
+            if lesson_id:
+                quiz.lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
+
+            quiz.save()
+            return redirect('online_courses:course_detail', course_id=course.id)
+    else:
+        form = QuizForm()
+
+    lessons = course.lessons.all()  
+
+    return render(request, "add_quiz.html", {"form": form, "course": course, "lessons": lessons})
+
+@login_required
+def add_question(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    if request.user != quiz.course.teacher:
+        return redirect("home")
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.quiz = quiz  # Привязываем вопрос к квизу
+            question.save()
+            return redirect("online_courses:course_detail", course_id=quiz.course.id)
+    else:
+        form = QuestionForm()
+
+    return render(request, "add_question.html", {"form": form, "quiz": quiz})
+
+@login_required
+def quiz_list(request):
+    quizzes = Quiz.objects.all()
+    return render(request, 'quiz_list.html', {'quizzes': quizzes})
 
 def account(request):
     return render(request, 'account.html')

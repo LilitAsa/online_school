@@ -9,7 +9,9 @@
     <p><strong>Учитель:</strong> {{ course.teacher }}</p>
 </div>
 
-{% if is_enrolled %}
+{% if is_teacher %}
+    <p>Вы учитель этого курса!</p>
+{% elif is_enrolled %}
     <p>Вы записаны на этот курс!</p>
 {% else %}
     <a href="{% url 'online_courses:enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
@@ -20,6 +22,7 @@
 <h3>Модули и уроки ({{ course.modules.count }})</h3>
 <p>Всего уроков: {{ course.modules.all|length }}</p>
 <p>Всего модулей: {{ course.modules.count }}</p>
+<p>Всего id: {{ course.id}}</p>
 
 <ul class="modules">
     {% for module in course.modules.all %}
@@ -36,4 +39,17 @@
         <p>Пока нет модулей.</p>
     {% endfor %}
 </ul>
+
+{% if quizzes %}
+    {% for quiz in quizzes %}
+        {% if request.user == course.teacher %}
+            <a href="{% url 'online_courses:quiz_detail' quiz.id %}" class="btn btn-info">Просмотреть квиз</a>
+        {% else %}
+            <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>К этому курсу пока не добавлен квиз.</p>
+{% endif %}
+
 {% endblock %}

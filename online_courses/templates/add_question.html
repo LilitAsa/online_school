@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Добавить вопрос в "{{ quiz.title }}"</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <button type="submit" class="btn btn-primary">Добавить вопрос</button>
+    </form>
+
+    <a href="{% url 'online_courses:course_detail' quiz.course.id %}" class="btn btn-secondary">Вернуться к курсу</a>
+{% endblock %}

@@ -71,6 +71,7 @@ class Module(models.Model):
     
 # Урок
 class Lesson(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = models.TextField(blank=True, null=True)
@@ -105,13 +106,16 @@ class Review(models.Model):
 
 # Квиз
 class Quiz(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="quizzes")
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     
     def __str__(self):
         return self.title
+    
+    def question_count(self):
+        return self.questions.count()
 
 # Вопрос к квизу
 class Question(models.Model):

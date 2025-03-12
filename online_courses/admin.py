@@ -24,9 +24,9 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'lesson')  
+    list_display = ('title', 'lesson','course')  
     search_fields = ('title', 'lesson__title')  
-    list_filter = ('lesson',)
+    list_filter = ('lesson','course')
 
 class HomeworkAdmin(admin.ModelAdmin):
     def get_queryset(self, request):

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Список квизов{% endblock %}
+
+{% block content %}
+<h2>Список квизов</h2>
+
+<ul>
+    {% for quiz in quizzes %}
+        <li>
+            <a href="{% url 'online_courses:quiz_detail' quiz.id %}">{{ quiz.title }}</a>
+        </li>
+    {% empty %}
+        <li>Квизы не найдены.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'online_courses:home' %}" class="btn btn-secondary">Назад на главную</a>
+{% endblock %}
