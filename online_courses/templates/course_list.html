@@ -4,9 +4,11 @@
 
 {% block content %}
 <h1>Мои курсы</h1>
-<ul>
+<ul class="list-group">
     {% for course in courses %}
-        <li><a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a></li>
+        <li class="list-group-item list-group-item-action">
+            <a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a>
+        </li>
     {% empty %}
         <p>Вы еще не записаны на курсы.</p>
     {% endfor %}

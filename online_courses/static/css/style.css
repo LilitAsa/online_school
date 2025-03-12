@@ -21,9 +21,14 @@ h1, h2 {
   margin-top: 20px;
 }
 
-.btn-primary {
+.btn-primary, .btn-primary a {
+  text-align: center;
   background-color: #007bff;
   border-color: #007bff;
+  color: #fff;
+  display: block;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
@@ -31,61 +36,79 @@ h1, h2 {
   border-color: #004085;
 }
 
-/* Styles for student_dashboard */
-.student-dashboard {
-  background-color: #f1f1f1;
+/* Styles for unordered lists */
+ul {
+  list-style-type: none; 
+  padding: 0;
+}
+
+ul li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+ul li:last-child {
+  border-bottom: none;
+}
+
+ul li a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Styles for quiz */
+.quiz {
+  background-color: #f9f9f9;
   padding: 20px;
   border-radius: 5px;
 }
 
-.student-dashboard h2 {
+.quiz h2 {
   color: #007bff;
 }
 
-.student-dashboard .list-group-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
+.quiz .question {
+  margin-bottom: 20px;
 }
 
-.student-dashboard .list-group-item:hover {
-  background-color: #e9ecef;
+.quiz .question h3 {
+  font-size: 1.5rem;
+  color: #333;
 }
 
-/* Styles for quiz_result */
-.quiz-result {
-  text-align: center;
-  margin-top: 50px;
-}
-
-.quiz-result h1 {
-  font-size: 2.5rem;
-  color: #28a745;
-}
-
-.quiz-result .btn-primary {
-  margin-top: 20px;
-}
-
-/* Styles for unordered lists */
-/* ul {
-  list-style-type: none; 
+.quiz .answers {
+  list-style-type: none;
   padding: 0;
- 
-  li {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+}
 
-    &:last-child {
-      border-bottom: none;
-    }
+.quiz .answers li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
 
-    a {
-      text-decoration: none;
-      color: #007bff;
+.quiz .answers li:last-child {
+  border-bottom: none;
+}
 
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-} */ 
+.quiz .answers li label {
+  cursor: pointer;
+}
+
+.quiz .answers li input[type="radio"] {
+  margin-right: 10px;
+}
+
+/* Styles for links */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

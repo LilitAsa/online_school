@@ -2,38 +2,37 @@
 
 {% block title %}Студенческая панель{% endblock %}
 
-    {% block content %}
-    <h1>Студенческая панель</h1>
+{% block content %}
+<h1>Студенческая панель</h1>
 
-    {% if assignments %}
-        <ul>
-            {% for assignment in assignments %}
-                <li>
-                    <p><strong>Курс:</strong> {{ assignment.course.title }}</p>
-                    <p><strong>Задание:</strong> {{ assignment.title }}</p>
-                    <p><strong>Описание:</strong> {{ assignment.description }}</p>
-                    <p><strong>Срок сдачи:</strong> {{ assignment.due_date }}</p>
-                    <a href="{% url 'online_courses:submit_homework' assignment.id %}" class="btn btn-primary">Отправить домашнее задание</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет заданий для выполнения.</p>
-    {% endif %}
-    <hr>
-    <h2>Доступные тесты</h2>
-    {% if quizzes %}
-        <ul class="list-group">
-            {% for quiz in quizzes %}
-                <li class="list-group-item list-group-item-action">
-                    <p><strong>Тест:</strong> {{ quiz.title }}</p>
-                    <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
-                    message
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет доступных тестов.</p>
-    {% endif %}
+{% if assignments %}
+    <ul>
+        {% for assignment in assignments %}
+            <li>
+                <p><strong>Курс:</strong> {{ assignment.course.title }}</p>
+                <p><strong>Задание:</strong> {{ assignment.title }}</p>
+                <p><strong>Описание:</strong> {{ assignment.description }}</p>
+                <p><strong>Срок сдачи:</strong> {{ assignment.due_date }}</p>
+                <a href="{% url 'online_courses:submit_homework' assignment.id %}" class="btn btn-primary">Отправить домашнее задание</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет заданий для выполнения.</p>
+{% endif %}
+<hr>
+<h2>Доступные тесты</h2>
+{% if quizzes %}
+    <ul class="list-group">
+        {% for quiz in quizzes %}
+            <li class="list-group-item list-group-item-action">
+                <p><strong>Тест:</strong> {{ quiz.title }}</p>
+                <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет доступных тестов.</p>
+{% endif %}
 
-{% endblock content %}
+{% endblock %}

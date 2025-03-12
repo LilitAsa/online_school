@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Список квизов{% endblock %}
+{% block title %}Список тестов{% endblock %}
 
 {% block content %}
-<h2>Список квизов</h2>
+<h1>Список тестов</h1>
 
-<ul>
-    {% for quiz in quizzes %}
-        <li>
-            <a href="{% url 'online_courses:quiz_detail' quiz.id %}">{{ quiz.title }}</a>
-        </li>
-    {% empty %}
-        <li>Квизы не найдены.</li>
-    {% endfor %}
-</ul>
+{% if quizzes %}
+    <ul class="list-group">
+        {% for quiz in quizzes %}
+            <li class="list-group-item list-group-item-action">
+                <p><strong>Тест:</strong> {{ quiz.title }}</p>
+                <p><strong>Описание:</strong> {{ quiz.description }}</p>
+                <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет доступных тестов.</p>
+{% endif %}
 
-<a href="{% url 'online_courses:home' %}" class="btn btn-secondary">Назад на главную</a>
 {% endblock %}
