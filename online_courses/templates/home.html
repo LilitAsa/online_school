@@ -35,16 +35,18 @@
 
         <div class="col-md-6">
             <h2>Доступные квизы</h2>
-            <ul>
+            <p>Количество квизов: {{ quizzes|length }}</p>
+            <ul class="list-group">
                 {% for quiz in quizzes %}
-                    <li>
-                        <a href="{% url 'online_courses:take_quiz' quiz.id %}">{{ quiz.title }}</a>
-                        (Курс: <a href="{% url 'online_courses:course_detail' quiz.course.id %}">{{ quiz.course.title }}</a>)
-                    </li>
-                {% empty %}
-                    <p>Квизов пока нет.</p>
+                    <li class="list-group-item list-group-item-action">
+                        <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="text-decoration-none">{{ quiz.title }}</a>
+                    </li>   
                 {% endfor %}
-            </ul>            
+            </ul>   
+
+            <hr>
+            <p><a href="{% url 'online_courses:quiz_list' %}" class="btn btn-primary">Список квизов</a></p>
+            
         </div>
     </div>
 

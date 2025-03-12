@@ -11,14 +11,27 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Quiz, Question, Answer, StudentAnswer
 from django.contrib import messages
+from django.db.models import Q
 
 
 # Главная страница
 def home(request):
     courses = Course.objects.all()
     homeworks = Homework.objects.all()
-    quizzes = Quiz.objects.all()
-    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks, 'quizzes':quizzes})
+    
+    if request.user.is_authenticated:
+        if request.user.role == 'teacher':
+            quizzes = Quiz.objects.filter(course__teacher=request.user)
+        else:
+            quizzes = Quiz.objects.filter(course__student=request.user)
+    else:
+        quizzes = Quiz.objects.none()  # No quizzes for unauthenticated users
+
+
+    print(f"Пользователь: {request.user}")  
+    print(f"Количество квизов: {quizzes.count()}")  
+    print(f"Список квизов: {quizzes}")  
+    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks, 'quizzes': quizzes})
 
 User = get_user_model()
 
@@ -72,14 +85,21 @@ def course_list(request):
 @login_required
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    quizzes = course.quizzes.all()
     is_teacher = request.user == course.teacher
     is_enrolled = course.students.filter(id=request.user.id).exists()
-    
-    return render(request, 'course_detail.html', {
-        'course': course, 'is_enrolled': is_enrolled, 
-        'is_teacher': is_teacher, 'quizzes': quizzes,
+
+    if is_teacher or is_enrolled:
+        quizzes = course.quizzes.all()  # Получаем все квизы для курса
+    else:
+        quizzes = []  # Не передаём квизы, если пользователь не подписан и не преподаватель
+
+    return render(request, "course_detail.html", {
+        "course": course,
+        "is_teacher": is_teacher,
+        "is_enrolled": is_enrolled,
+        "quizzes": quizzes,
     })
+
 
 # Modules
 @login_required
@@ -339,11 +359,21 @@ def add_question(request, quiz_id):
         form = QuestionForm()
 
     return render(request, "add_question.html", {"form": form, "quiz": quiz})
-
 @login_required
 def quiz_list(request):
-    quizzes = Quiz.objects.all()
-    return render(request, 'quiz_list.html', {'quizzes': quizzes})
+    if request.user.is_staff:  # Администратор видит все квизы
+        quizzes = Quiz.objects.all()
+    else:
+        quizzes = Quiz.objects.filter(
+            Q(course__teacher=request.user) | Q(course__students=request.user)
+        ).distinct()
+
+    print(f"Пользователь: {request.user}")  # Кто делает запрос
+    print(f"Количество квизов: {quizzes.count()}")  # Сколько квизов найдено
+    print(f"Список квизов: {quizzes}")  # Что конкретно передаётся
+
+    return render(request, "quiz_list.html", {"quizzes": quizzes})
+
 
 def account(request):
     return render(request, 'account.html')
