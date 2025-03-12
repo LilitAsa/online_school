@@ -11,7 +11,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Quiz, Question, Answer, StudentAnswer
 from django.contrib import messages
-from django.db.models import Q
+from functools import wraps
+
+def teacher_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.role != 'teacher':
+            raise PermissionDenied("Доступ запрещен.")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 
 # Главная страница
@@ -23,7 +31,7 @@ def home(request):
         if request.user.role == 'teacher':
             quizzes = Quiz.objects.filter(course__teacher=request.user)
         else:
-            quizzes = Quiz.objects.filter(course__student=request.user)
+            quizzes = Quiz.objects.filter(course__students=request.user)
     else:
         quizzes = Quiz.objects.none()  # No quizzes for unauthenticated users
 
@@ -130,12 +138,9 @@ def enroll_course(request, course_id):
 
     return render(request, 'enroll_course.html', {'course': course})
 
-
+@teacher_required
 @login_required
 def add_homework(request):
-    if request.user.role != 'teacher':
-        raise PermissionDenied("Только преподаватели могут добавлять домашние задания.")
-    
     if request.method == 'POST':
         form = HomeworkForm(request.POST)
         if form.is_valid():
@@ -225,16 +230,13 @@ def submit_homework(request, homework_id):
     return render(request, 'submit_homework.html', {'homework': homework})
 
 # Проверка домашних заданий
+@teacher_required
 @login_required
 def review_homework(request, submission_id):
     submission = HomeworkSubmission.objects.filter(id=submission_id).first()
 
     if not submission:
         return HttpResponseNotFound("HomeworkSubmission not found.")
-
-    # Check if the user is a teacher
-    if not hasattr(request.user, 'role') or request.user.role != 'teacher':
-        raise PermissionDenied("You do not have permission to review this homework.")
 
     if request.method == "POST":
         form = ReviewHomeworkForm(request.POST, instance=submission)
@@ -252,11 +254,9 @@ def review_homework(request, submission_id):
 
     return render(request, 'review_homework.html', {'form': form, 'submission': submission})
 
+@teacher_required
 @login_required
 def add_course(request):
-    if request.user.role != 'teacher':
-        raise PermissionDenied("Только преподаватели могут добавлять курсы.")
-
     if request.method == "POST":
         form = CourseForm(request.POST)
         if form.is_valid():
@@ -314,7 +314,7 @@ def add_quiz(request, course_id):
     lesson_id = request.POST.get("lesson")
     
     if lesson_id:
-        lesson = get_object_or_404(Lesson, id=lesson_id)
+        lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
         if lesson.course != course:
             return redirect("home")  # Защита от подмены данных
         quiz.lesson = lesson
@@ -331,7 +331,8 @@ def add_quiz(request, course_id):
             lesson_id = request.POST.get("lesson")
             if lesson_id:
                 quiz.lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
-
+            
+            quiz.lesson = lesson
             quiz.save()
             return redirect('online_courses:course_detail', course_id=course.id)
     else:
@@ -359,21 +360,16 @@ def add_question(request, quiz_id):
         form = QuestionForm()
 
     return render(request, "add_question.html", {"form": form, "quiz": quiz})
+
 @login_required
 def quiz_list(request):
     if request.user.is_staff:  # Администратор видит все квизы
         quizzes = Quiz.objects.all()
+    elif request.user.role == 'teacher':
+        quizzes = Quiz.objects.filter(course__teacher=request.user)
     else:
-        quizzes = Quiz.objects.filter(
-            Q(course__teacher=request.user) | Q(course__students=request.user)
-        ).distinct()
-
-    print(f"Пользователь: {request.user}")  # Кто делает запрос
-    print(f"Количество квизов: {quizzes.count()}")  # Сколько квизов найдено
-    print(f"Список квизов: {quizzes}")  # Что конкретно передаётся
-
-    return render(request, "quiz_list.html", {"quizzes": quizzes})
-
+        quizzes = Quiz.objects.filter(course__students=request.user)
+    return render(request, 'quiz_list.html', {'quizzes': quizzes})
 
 def account(request):
     return render(request, 'account.html')
@@ -385,6 +381,6 @@ def student_dashboard(request):
 
     # Get the list of assignments for the student
     assignments = Homework.objects.filter(course__students=request.user)
-    quizzes = Quiz.objects.filter(lesson__module__course__students=request.user)
+    quizzes = Quiz.objects.filter(course__students=request.user)
 
     return render(request, 'student_dashboard.html', {'assignments': assignments, 'quizzes': quizzes})

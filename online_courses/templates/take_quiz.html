@@ -7,16 +7,22 @@
     <h2>{{ quiz.title }}</h2>
     <form method="post">
         {% csrf_token %}
-        {% for question in questions %}
-            <p>{{ question.text }}</p>
-            {% for choice in question.get_choices %}
-                <label>
-                    <input type="radio" name="question_{{ question.id }}" value="{{ choice }}" required>
-                    {{ choice }}
-                </label>
-            {% endfor %}
+        {% for question in quiz.questions.all %}
+            <div class="question">
+                <h3>{{ question.text }}</h3>
+                <ul class="answers">
+                    {% for choice in question.get_choices %}
+                        <li>
+                            <label>
+                                <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
+                                {{ choice }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endfor %}
-        <button type="submit">Отправить</button>
-    </form>    
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
 </div>
 {% endblock %}
