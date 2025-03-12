@@ -342,7 +342,10 @@ def add_question(request, quiz_id):
 
 @login_required
 def quiz_list(request):
-    quizzes = Quiz.objects.all()
+    if request.user.role == 'teacher':
+        quizzes = Quiz.objects.filter(course__teacher=request.user)
+    else:
+        quizzes = Quiz.objects.filter(course__students=request.user)
     return render(request, 'quiz_list.html', {'quizzes': quizzes})
 
 def account(request):
