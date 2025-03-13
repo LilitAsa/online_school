@@ -17,7 +17,7 @@ def teacher_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if request.user.role != 'teacher':
-            raise PermissionDenied("Доступ запрещен.")
+            raise PermissionDenied("Доступ запрещен. Вход только учителям")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
@@ -26,21 +26,33 @@ def teacher_required(view_func):
 def home(request):
     courses = Course.objects.all()
     homeworks = Homework.objects.all()
+    lessons = Lesson.objects.none()  
+    quizzes = Quiz.objects.none() 
+    teachers = User.objects.filter(role='teacher')
+    
+    print()
     
     if request.user.is_authenticated:
         if request.user.role == 'teacher':
+            lessons = Lesson.objects.filter(course__teacher=request.user)
             quizzes = Quiz.objects.filter(course__teacher=request.user)
+            homeworks = Homework.objects.filter(course__teacher=request.user)
+            homeworks = Homework.objects.none()
+            
         else:
+            lessons = Lesson.objects.filter(course__students=request.user)
             quizzes = Quiz.objects.filter(course__students=request.user)
-    else:
-        quizzes = Quiz.objects.none()  # No quizzes for unauthenticated users
-
-
-    print(f"Пользователь: {request.user}")  
-    print(f"Количество квизов: {quizzes.count()}")  
-    print(f"Список квизов: {quizzes}")  
-    return render(request, 'home.html', {'courses': courses, 'homeworks': homeworks, 'quizzes': quizzes})
-
+            homeworks = Homework.objects.filter(course__students=request.user) 
+            
+    return render(request, 'home.html', {
+        'courses': courses,
+        'homeworks': homeworks,
+        'lessons': lessons,
+        'quizzes': quizzes,
+        'homeworks': homeworks,
+        'teachers': teachers,
+    })
+    
 User = get_user_model()
 
 def user_login(request):
@@ -146,8 +158,12 @@ def add_homework(request):
         if form.is_valid():
             homework = form.save(commit=False)
             homework.assigned_by = request.user
+            homework.course = form.cleaned_data.get('course')
             homework.save()
+            print(f"Домашнее задание {homework.title} добавлено для курса {homework.course}")
             return redirect('online_courses:home')
+        else:
+            print("Форма невалидна:", form.errors)
     else:
         form = HomeworkForm()
     
@@ -384,3 +400,16 @@ def student_dashboard(request):
     quizzes = Quiz.objects.filter(course__students=request.user)
 
     return render(request, 'student_dashboard.html', {'assignments': assignments, 'quizzes': quizzes})
+
+def teacher_list(request):
+    teachers = User.objects.filter(role='teacher')
+    return render(request, 'teachers.html', {'teachers': teachers})
+
+def about(request):
+    return render(request, 'about.html')
+
+def contact(request):
+    return render(request, 'contact.html')
+
+def privacy(request):
+    return render(request, 'privacy.html')

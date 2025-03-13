@@ -7,6 +7,12 @@
     <h1>Добро пожаловать на учебную платформу!</h1>
     <p>Привет, {{ user.username }}!</p>
 
+    <div class="col-md-6">
+        <a href="{% url 'online_courses:teacher_list' %}" class="btn btn-info">
+            Наш Педагогический состав
+        </a>
+    </div>
+
     <div class="row">
         <div class="col-md-6">
             <h2>Курсы</h2>
@@ -27,8 +33,10 @@
             <ul class="list-group">
                 {% for homework in homeworks %}
                     <li class="list-group-item list-group-item-action">
-                        <a href="{% url 'online_courses:review_homework' homework.id %}" class="text-decoration-none">{{ homework.title }}</a>
+                        <a href="{% url 'online_courses:review_homework' homework.id %}" class="text-decoration-none">{{ homework.title }} - {{ homework.course.name }}</a>
                     </li>
+                {% empty %}
+                    <li class="list-group-item list-group-item-action">Нет доступных домашних заданий.</li>
                 {% endfor %}
             </ul>
         </div>

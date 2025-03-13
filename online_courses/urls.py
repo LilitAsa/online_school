@@ -9,6 +9,9 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path('register/', register, name='register'),
     
+    #Пользователи
+    path('teachers', teacher_list, name='teacher_list'),
+    
     # Курсы
     path('courses/', course_list, name='course_list'),
     path('course/<int:course_id>/', course_detail, name='course_detail'),
@@ -38,4 +41,9 @@ urlpatterns = [
     path('quiz/<int:quiz_id>/add-question/', add_question, name='add_question'), 
     path('quiz/<int:quiz_id>/', quiz_detail, name='quiz_detail'),
     path('quizzes/', quiz_list, name='quiz_list'),
+    
+    #
+    path('about/', about, name='about'),
+    path('contact/', contact, name='contact'),
+    path('privacy/', privacy, name='privacy'),
     ]

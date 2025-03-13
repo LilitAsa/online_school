@@ -7,7 +7,7 @@
 <ul class="list-group">
     {% for course in courses %}
         <li class="list-group-item list-group-item-action">
-            <a href="{% url 'online_courses:course_detail' course.id %}">{{ course.title }}</a>
+            <a href="{% url 'online_courses:course_detail' course.id %}" class="text-decoration-none">{{ course.title }}</a>
         </li>
     {% empty %}
         <p>Вы еще не записаны на курсы.</p>

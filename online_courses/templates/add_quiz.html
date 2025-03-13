@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Добавить тест в курс: {{ course.title }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
 
 <form method="post">
     {% csrf_token %}
@@ -17,7 +14,7 @@
         {% endfor %}
     </select>
 
-    <button type="submit">Добавить квиз</button>
+    <button type="submit" class="btn btn-primary">Добавить квиз</button>
 </form>
 
 <h2>Доступные уроки:</h2>

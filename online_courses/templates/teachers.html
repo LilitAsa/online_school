@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Студенческая панель{% endblock %}
+
+{% block content %}
+<h1>Наши педагоги</h1>
+
+<ul class="list-group">
+  {% for teacher in teachers %}
+      <li class="list-group-item list-group-item-action">
+          {{ teacher.username}} - {{teacher.email}}
+      </li>
+  {% endfor %}
+</ul>
+{% endblock content %}

@@ -9,7 +9,7 @@
 
     <form method="post" action="{% url 'online_courses:enroll_course' course.id %}">
         {% csrf_token %}
-        <button type="submit">Записаться</button>
+        <button type="submit" class="btn btn-primary">Записаться</button>
     </form>
 
     <a href="{% url 'online_courses:course_list' %}">Вернуться к курсам</a>
