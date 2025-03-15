@@ -1,55 +1,108 @@
-/* Custom styles for hover effects
-.list-group-item-action:hover {
-  background-color: #f8f9fa;
-  cursor: pointer;
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+/* -------------------- */
+/* CSS Variables */
+/* -------------------- */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #0056b3;
+  --text-color: #333;
+  --background-color: #f9f9f9;
+  --border-color: #ddd;
+  --footer-background-color: #2c3e50;
+  --footer-text-color: white;
+  --footer-link-color: #f1c40f;
 }
 
-.text-decoration-none:hover {
-  text-decoration: underline;
-}
-
-/* Additional custom styles */
+/* -------------------- */
+/* Общие стили */
+/* -------------------- */
 body {
   font-family: Arial, sans-serif;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 main {
-  min-height: auto;
+  flex: 1;
 }
 
+/* -------------------- */
+/* Заголовки */
+/* -------------------- */
 h1, h2 {
-  color: #333;
+  color: var(--text-color);
 }
 
+/* -------------------- */
+/* Контейнеры */
+/* -------------------- */
 .container {
   margin-top: 20px;
 }
 
-.btn-primary, .btn-primary a {
+/* -------------------- */
+/* Кнопки */
+/* -------------------- */
+.btn-primary {
   text-align: center;
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
   color: #fff;
   display: block;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition: all 0.3s ease-in-out;
   cursor: pointer;
+  border-radius: 5px;
+  padding: 10px 15px;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #004085;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transform: scale(1.05);
 }
 
-/* Styles for unordered lists */
+/* -------------------- */
+/* Ссылки */
+/* -------------------- */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+/* -------------------- */
+/* Навигация */
+/* -------------------- */
+.navbar-brand {
+  color: var(--primary-color);
+  font-family: "Pacifico", cursive, sans-serif;
+  font-size: 2rem;
+}
+
+.navbar-brand:hover {
+  color: var(--secondary-color);
+}
+
+/* -------------------- */
+/* Списки */
+/* -------------------- */
 ul {
-  list-style-type: none; 
+  list-style-type: none;
   padding: 0;
 }
 
 ul li {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 
 ul li:last-child {
@@ -58,81 +111,117 @@ ul li:last-child {
 
 ul li a {
   text-decoration: none;
-  color: #007bff;
+  color: var(--primary-color);
 }
 
 ul li a:hover {
   text-decoration: underline;
 }
 
-/* Styles for quiz */
+/* -------------------- */
+/* Курсы (карточки) */
+/* -------------------- */
+.course-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* -------------------- */
+/* Квизы */
+/* -------------------- */
 .quiz {
-  background-color: #f9f9f9;
+  background-color: var(--background-color);
   padding: 20px;
   border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .quiz h2 {
-  color: #007bff;
+  color: var(--primary-color);
 }
 
 .quiz .question {
   margin-bottom: 20px;
 }
 
-.quiz .question h3 {
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.quiz .answers {
-  list-style-type: none;
-  padding: 0;
-}
-
 .quiz .answers li {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.quiz .answers li:last-child {
-  border-bottom: none;
-}
-
-.quiz .answers li label {
-  cursor: pointer;
-}
-
-.quiz .answers li input[type="radio"] {
-  margin-right: 10px;
-}
-
-/* Styles for links */
-a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
-
+/* -------------------- */
+/* Футер */
+/* -------------------- */
 .footer {
-  background-color: #2c3e50;
-  color: white;
+  background-color: var(--footer-background-color);
+  color: var(--footer-text-color);
   text-align: center;
-  padding: 15px 0;
-  position: absolute;
-  bottom: 0;
+  padding: 20px 0;
   width: 100%;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .footer a {
-  color: #f1c40f;
-  text-decoration: none;
+  color: var(--footer-link-color);
+  font-weight: bold;
+  transition: color 0.3s ease;
 }
 
 .footer a:hover {
-  text-decoration: underline;
-} 
+  color: var(--secondary-color);
+}
+
+.footer-links {
+  display: flex;
+  gap: 15px;
+}
+
+.footer-links a {
+  text-decoration: none;
+}
+
+/* -------------------- */
+/* Адаптивность */
+/* -------------------- */
+@media (max-width: 768px) {
+  .container {
+    margin-top: 10px;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .quiz .question h3 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .btn-primary {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}

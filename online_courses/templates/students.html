@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Педагоги{% endblock %}
+{% block title %}Студенты{% endblock %}
 
 {% block content %}
-<h1>Наши педагоги</h1>
+<h1>Наши студенты</h1>
 
 <ul class="list-group">
-  {% for teacher in teachers %}
+  {% for student in students %}
       <li class="list-group-item list-group-item-action">
-          {{ teacher.username}} - {{teacher.email}} - {{}}
+          {{ student.username}} - {{student.email}}
       </li>
   {% endfor %}
 </ul>

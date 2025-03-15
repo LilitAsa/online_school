@@ -405,6 +405,10 @@ def teacher_list(request):
     teachers = User.objects.filter(role='teacher')
     return render(request, 'teachers.html', {'teachers': teachers})
 
+def student_list(request):
+    students = User.objects.filter(role='student')
+    return render(request, 'students.html', {'students': students})
+
 def about(request):
     return render(request, 'about.html')
 

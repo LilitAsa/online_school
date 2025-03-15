@@ -4,9 +4,9 @@
 
 {% block content %}
 <h1>Добавление курса</h1>
-<form method="post">
+<form method="post" class="mb-4">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Добавить</button>
+    <button type="submit" class="btn btn-primary">Добавить</button>
 </form>
 {% endblock %}

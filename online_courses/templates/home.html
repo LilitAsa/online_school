@@ -7,14 +7,22 @@
     <h1>Добро пожаловать на учебную платформу!</h1>
     <p>Привет, {{ user.username }}!</p>
 
-    <div class="col-md-6">
-        <a href="{% url 'online_courses:teacher_list' %}" class="btn btn-info">
-            Наш Педагогический состав
-        </a>
+    <div class="row">
+        <div class="mb-4 col-sm-3">
+            <a href="{% url 'online_courses:teacher_list' %}">
+                Наши Педагоги
+            </a>
+        </div>
+    
+        <div class="mb-4 col-sm-3" >
+            <a href="{% url 'online_courses:student_list' %}">
+                Наши Студенты
+            </a>
+        </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 mb-2">
             <h2>Курсы</h2>
             <p>Выберите курс для изучения:</p>
             <p>Количество курсов: {{ courses|length }}</p>
