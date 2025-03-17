@@ -47,7 +47,7 @@
         {% if request.user == course.teacher %}
             <a href="{% url 'online_courses:quiz_detail' quiz.id %}" class="btn btn-info">Просмотреть квиз</a>
         {% else %}
-            <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
+            <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary" class="fade-in">Пройти тест</a>
         {% endif %}
     {% endfor %}
 {% else %}

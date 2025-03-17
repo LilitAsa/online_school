@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("theme-icon").classList.replace("fa-moon", "fa-sun");
   }
 });
+
 function toggleTheme() {
   document.body.classList.toggle("dark-theme");
   const icon = document.getElementById("theme-icon");
