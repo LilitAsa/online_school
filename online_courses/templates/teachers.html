@@ -7,8 +7,8 @@
 
 <ul class="list-group">
   {% for teacher in teachers %}
-      <li class="list-group-item list-group-item-action">
-          {{ teacher.username}} - {{teacher.email}} - {{}}
+      <li class="course-card">
+          {{ teacher.username}} - {{teacher.email}}
       </li>
   {% endfor %}
 </ul>

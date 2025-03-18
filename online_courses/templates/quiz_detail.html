@@ -1,10 +1,16 @@
-<h2>Квиз: {{ quiz.title }}</h2>
+{% extends "base.html" %}
+{% block content %}
+        
+    <h2>Квиз: {{ quiz.title }}</h2>
 
-{% for question in questions %}
-    <p>{{ question.text }}</p>
-{% empty %}
-    <p>Вопросов пока нет.</p>
-{% endfor %}
+    {% for question in questions %}
+        <p>{{ question.text }}</p>
+        <p>{{ question.answer }}</p>
+    {% empty %}
+        <p>Вопросов пока нет.</p>
+    {% endfor %}
 
-<a href="{% url 'online_courses:add_question' quiz.id %}" class="btn btn-primary">Добавить вопрос</a>
-<a href="{% url 'online_courses:quiz_list' %}" class="btn btn-secondary">Назад к списку квизов</a>
+    <a href="{% url 'online_courses:add_question' quiz.id %}" class="btn">Добавить вопрос</a>
+    <a href="{% url 'online_courses:quiz_list' %}" class="btn btn-secondary w-mc">Назад к списку квизов</a>
+
+{% endblock content %}

@@ -21,36 +21,33 @@ def teacher_required(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
+def get_user_courses(user):
+    if user.role == 'teacher':
+        return Course.objects.filter(teacher=user)
+    return Course.objects.filter(students=user)
 
 # Главная страница
 def home(request):
-    courses = Course.objects.all()
-    homeworks = Homework.objects.all()
-    lessons = Lesson.objects.none()  
-    quizzes = Quiz.objects.none() 
-    teachers = User.objects.filter(role='teacher')
-    
-    print()
-    
-    if request.user.is_authenticated:
-        if request.user.role == 'teacher':
-            lessons = Lesson.objects.filter(course__teacher=request.user)
-            quizzes = Quiz.objects.filter(course__teacher=request.user)
-            homeworks = Homework.objects.filter(course__teacher=request.user)
-            homeworks = Homework.objects.none()
-            
-        else:
-            lessons = Lesson.objects.filter(course__students=request.user)
-            quizzes = Quiz.objects.filter(course__students=request.user)
-            homeworks = Homework.objects.filter(course__students=request.user) 
-            
+    if not request.user.is_authenticated:
+        return render(request, 'home.html', {
+            'courses': Course.objects.all(),
+            'homeworks': Homework.objects.none(),
+            'lessons': Lesson.objects.none(),
+            'quizzes': Quiz.objects.none(),
+            'teachers': User.objects.filter(role='teacher'),
+        })
+
+    user_courses = get_user_courses(request.user)
+    lessons = Lesson.objects.filter(course__in=user_courses)
+    quizzes = Quiz.objects.filter(course__in=user_courses)
+    homeworks = Homework.objects.filter(course__in=user_courses)
+
     return render(request, 'home.html', {
-        'courses': courses,
+        'courses': user_courses,
         'homeworks': homeworks,
         'lessons': lessons,
         'quizzes': quizzes,
-        'homeworks': homeworks,
-        'teachers': teachers,
+        'teachers': User.objects.filter(role='teacher'),
     })
     
 User = get_user_model()

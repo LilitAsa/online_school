@@ -23,9 +23,9 @@
 <hr>
 <h2>Доступные тесты</h2>
 {% if quizzes %}
-    <ul class="list-group">
+    <ul>
         {% for quiz in quizzes %}
-            <li class="list-group-item list-group-item-action">
+            <li class="course-card">
                 <p><strong>Тест:</strong> {{ quiz.title }}</p>
                 <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Пройти тест</a>
             </li>

@@ -5,9 +5,9 @@
 {% block content %}
 <h1>Наши студенты</h1>
 
-<ul class="list-group">
+<ul>
   {% for student in students %}
-      <li class="list-group-item list-group-item-action">
+      <li class="course-card">
           {{ student.username}} - {{student.email}}
       </li>
   {% endfor %}

@@ -6,9 +6,9 @@
 <h1>Список тестов</h1>
 
 {% if quizzes %}
-    <ul class="list-group">
+    <ul>
         {% for quiz in quizzes %}
-            <li class="list-group-item list-group-item-action">
+            <li class="course-card">
                 <p><strong>Тест:</strong> {{ quiz.title }}</p>
                 <p><strong>Описание:</strong> {{ quiz.description }}</p>
                 <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary">Тест</a>

@@ -12,7 +12,7 @@
                 <h3>{{ question.text }}</h3>
                 <ul class="answers">
                     {% for choice in question.get_choices %}
-                        <li>
+                        <li class="course-card">
                             <label>
                                 <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
                                 {{ choice }}

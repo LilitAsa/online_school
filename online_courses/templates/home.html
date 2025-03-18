@@ -3,66 +3,85 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" >
     <h1 class="fade-in">Добро пожаловать на учебную платформу!</h1>
     <p>Привет, {{ user.username }}!</p>
 
     <div class="row">
-        <div class="mb-4 col-sm-3">
-            <a href="{% url 'online_courses:teacher_list' %}">
+        <div class="mb-4 col-6 col-sm-3">
+            <a href="{% url 'online_courses:teacher_list' %}" class="btn btn-outline-primary">
                 Наши Педагоги
             </a>
         </div>
     
-        <div class="mb-4 col-sm-3" >
-            <a href="{% url 'online_courses:student_list' %}">
+        <div class="mb-4 col-6 col-sm-3">
+            <a href="{% url 'online_courses:student_list' %}" class="btn btn-outline-primary">
                 Наши Студенты
             </a>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-2">
+        <div class="col-md-6 col-12 mb-2">
             <h2>Курсы</h2>
             <p>Выберите курс для изучения:</p>
             <p>Количество курсов: {{ courses|length }}</p>
-            <ul class="list-group">
-                {% for course in courses %}
-                    <li class="list-group-item list-group-item-action">
-                        <a href="{% url 'online_courses:course_detail' course.id %}" class="text-decoration-none">{{ course.title }} - учитель: {{ course.teacher }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if courses %}
+                <ul class="list-group">
+                    {% for course in courses %}
+                        <li class="course-card">
+                            <a href="{% url 'online_courses:course_detail' course.id %}" class="text-decoration-none">
+                                {{ course.title }} - учитель: {{ course.teacher }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Курсов пока нет.</p>
+            {% endif %}
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6 col-12">
             <h2>Домашние задания</h2>
             <p>Количество домашних заданий: {{ homeworks|length }}</p>
-            <ul class="list-group">
-                {% for homework in homeworks %}
-                    <li class="list-group-item list-group-item-action">
-                        <a href="{% url 'online_courses:review_homework' homework.id %}" class="text-decoration-none">{{ homework.title }} - {{ homework.course.name }}</a>
-                    </li>
-                {% empty %}
-                    <li class="list-group-item list-group-item-action">Нет доступных домашних заданий.</li>
-                {% endfor %}
-            </ul>
+            {% if homeworks %}
+                <ul>
+                    {% for homework in homeworks %}
+                        <li class="course-card">
+                            <a href="{% url 'online_courses:review_homework' homework.id %}" class="text-decoration-none">
+                                {{ homework.title }} - {{ homework.course.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет доступных домашних заданий.</p>
+            {% endif %}
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6 col-12">
             <h2>Доступные квизы</h2>
             <p>Количество квизов: {{ quizzes|length }}</p>
-            <ul class="list-group">
-                {% for quiz in quizzes %}
-                    <li class="list-group-item list-group-item-action">
+            {% if quizzes %}
+                <ul class="list-group">
+                    {% for quiz in quizzes %}
+                    <li class="course-card">
                         <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="text-decoration-none">{{ quiz.title }}</a>
                     </li>   
-                {% endfor %}
-            </ul>   
+                    {% empty %}
+                        <li class="list-group-item">Нет доступных квизов.</li>
+                    {% endfor %}
+                </ul>   
+            {% else %}
+                <p>Нет доступных квизов.</p>
+            {% endif %}
 
             <hr>
-            <p><a href="{% url 'online_courses:quiz_list' %}" class="btn btn-primary">Список квизов</a></p>
-            
+            <p>
+                <a href="{% url 'online_courses:quiz_list' %}" class="btn btn-primary">
+                    Список квизов
+                </a>
+            </p>
         </div>
     </div>
 
@@ -71,7 +90,11 @@
         <div class="row">
             <div class="col-md-12">
                 <h2>Добавить домашнее задание</h2>
-                <p><a href="{% url 'online_courses:add_homework' %}" class="btn btn-primary">Добавить домашнее задание</a></p>
+                <p>
+                    <a href="{% url 'online_courses:add_homework' %}" class="btn btn-primary">
+                        Добавить домашнее задание
+                    </a>
+                </p>
             </div>
         </div>
     {% elif user.role == 'student' %}
@@ -79,7 +102,11 @@
         <div class="row">
             <div class="col-md-12">
                 <h2>Студенческая панель</h2>
-                <p><a href="{% url 'online_courses:student_dashboard' %}" class="btn btn-primary">Перейти в студенческую панель</a></p>
+                <p>
+                    <a href="{% url 'online_courses:student_dashboard' %}" class="btn btn-primary">
+                        <i class="fas fa-user-graduate"></i> Перейти в студенческую панель
+                    </a>
+                </p>
             </div>
         </div>
     {% endif %}

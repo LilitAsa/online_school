@@ -17,7 +17,6 @@
 /* Тёмная тема */
 .dark-theme {
   --background-color: #121212;
-  --text-color: #ffffff;
   --navbar-background: #1e1e1e;
   --navbar-text-color: #f1c40f;
   --primary-color: #1e90ff;
@@ -32,6 +31,10 @@
 /* -------------------- */
 /* Общие стили */
 /* -------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html, body {
   background-color: var(--background-color) !important;
   color: var(--text-color);
@@ -59,7 +62,7 @@ body {
 }
 
 .fade-in {
-  animation: fadeIn 0.s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 main {
@@ -96,13 +99,13 @@ h1, h2 {
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
 
-  &::before {
-    content: "\f067"; /* Иконка "+" */
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    margin-right: 5px;
-  }
+.btn-primary::before {
+  content: "\f067";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-right: 5px;
 }
 
 .btn-primary i {
@@ -157,6 +160,13 @@ a:hover {
   color: var(--secondary-color);
 }
 
+.navbar-toggler {
+  background: var(--navbar-text-color);
+  &:focus {
+    outline: none;
+  }
+}
+
 /* -------------------- */
 /* Списки */
 /* -------------------- */
@@ -175,6 +185,8 @@ ul li:last-child {
 }
 
 ul li a {
+  display: inline-block;
+  width: 100%;
   text-decoration: none;
   color: var(--primary-color);
 }
@@ -187,19 +199,38 @@ ul li a:hover {
 /* Курсы (карточки) */
 /* -------------------- */
 .course-card {
-  background: white;
+  background: var(--background-color);
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
   transition: transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .course-card:hover {
+  background: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
   transform: scale(1.02);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
+.course-card h3 {
+  color: #007bff;
+}
+
+.btn {
+  display: inline-block;
+  padding: 5px 10px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+.btn:hover {
+  background: #0056b3;
+}
 /* -------------------- */
 /* Квизы */
 /* -------------------- */
@@ -232,6 +263,7 @@ ul li a:hover {
   gap: 10px;
   cursor: pointer;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .theme-switch i {
@@ -273,7 +305,9 @@ ul li a:hover {
 /* -------------------- */
 @media (max-width: 768px) {
   .container {
+    margin: 0 auto;
     margin-top: 10px;
+    padding: 0;
   }
 
   .btn-primary {
