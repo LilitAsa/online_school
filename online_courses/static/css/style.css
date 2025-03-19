@@ -101,13 +101,6 @@ h1, h2 {
   transition: all 0.3s ease-in-out;
 }
 
-.btn-primary::before {
-  content: "\f067";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-  margin-right: 5px;
-}
-
 .btn-primary i {
   font-size: 18px;
 }
@@ -115,6 +108,7 @@ h1, h2 {
 .btn-primary:hover {
   background-color: var(--secondary-color);
   border-color: var(--secondary-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transform: scale(1.05);
 }
 

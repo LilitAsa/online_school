@@ -61,7 +61,7 @@ class Progress(models.Model):
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=200)
-    order = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ['course', 'order']
@@ -72,15 +72,15 @@ class Module(models.Model):
 # Урок
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")  # Add related_name here
     title = models.CharField(max_length=200)
     content = models.TextField(blank=True, null=True)
     video_url = models.URLField(blank=True, null=True)
     file = models.FileField(upload_to='lessons/files/', blank=True, null=True)
-    
+
     def __str__(self):
         return f"{self.title} (Module: {self.module.title})"
-
+    
 # Запись на курс
 class Enrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_enrollments')

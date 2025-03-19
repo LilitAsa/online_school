@@ -1,57 +1,77 @@
+<!-- filepath: c:\Users\HOME\Desktop\PYTHON25\projects\school\online_courses\templates\course_detail.html -->
 {% extends 'base.html' %}
 
 {% block title %}{{ course.title }}{% endblock %}
 
 {% block content %}
-<div class="course-detail">
+<div class="container mt-4">
     <h1>{{ course.title }}</h1>
     <p><strong>Описание:</strong> {{ course.description }}</p>
-    <p><strong>Учитель:</strong> {{ course.teacher }}</p>
-</div>
+    <p><strong>Преподаватель:</strong> {{ course.teacher }}</p>
 
-{% if is_teacher %}
-    <p>Вы учитель этого курса!</p>
-{% elif is_enrolled %}
-    <p>Вы записаны на этот курс!</p>
-{% else %}
-    <a href="{% url 'online_courses:enroll_course' course.id %}" class="btn btn-primary">Записаться</a>
-{% endif %}
+    {% if is_teacher %}
+        <div class="mt-3 mb-3 d-flex col-6 justify-content-between">
+            <a href="{% url 'online_courses:add_module_and_lesson' course.id %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Добавить модуль или урок
+            </a>
+            <a href="{% url 'online_courses:add_quiz' course.id %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Добавить квиз
+            </a>
+        </div>
+    {% endif %}
 
-<hr>
+    <hr>
+    <h2>Модули и уроки</h2>
+    {% if modules %}
+        <ul class="list-group">
+            {% for module in modules %}
+                <li class="course-card">
+                    <h3>{{ module.title }}</h3>
+                    <ul>
+                        {% for lesson in module.lessons.all %}
+                            <li class="course-card">
+                                <a href="{% url 'online_courses:lesson_detail' course.id lesson.id %}">
+                                    {{ lesson.title }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>Нет уроков</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Модули пока не добавлены.</p>
+    {% endif %}
 
-<h3>Модули и уроки ({{ course.modules.count }})</h3>
-<p>Всего уроков: {{ course.modules.all|length }}</p>
-<p>Всего модулей: {{ course.modules.count }}</p>
-<p>Всего id: {{ course.id}}</p>
+    <hr>
 
-<ul class="modules">
-    {% for module in course.modules.all %}
-        <li><strong>{{ module.title }}</strong>
-            <ul>
-                {% for lesson in module.lesson_set.all %}
-                    <li class="list-group-item list-group-item-action">
-                        <a href="{% url 'online_courses:lesson_detail' course.id lesson.id %}" class="text-decoration-none">{{ lesson.title }}</a>
-                    </li>
-                {% empty %}
-                    <li>Нет уроков</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% empty %}
-        <p>Пока нет модулей.</p>
-    {% endfor %}
-</ul>
+    <h2>Квизы</h2>
+    <div class="mt-3 d-flex col-6 justify-content-between mb-4">
 
-{% if quizzes %}
-    {% for quiz in quizzes %}
-        {% if request.user == course.teacher %}
-            <a href="{% url 'online_courses:quiz_detail' quiz.id %}" class="btn btn-info">Просмотреть квиз</a>
+        {% if quizzes %}
+            {% for quiz in quizzes %}
+                {% if is_teacher %}
+                    <a href="{% url 'online_courses:quiz_detail' quiz.id %}" class="btn btn-info">Просмотреть квиз</a>
+                {% else %}
+                    <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary fade-in">Пройти тест</a>
+                {% endif %}
+            {% endfor %}
         {% else %}
-            <a href="{% url 'online_courses:take_quiz' quiz.id %}" class="btn btn-primary" class="fade-in">Пройти тест</a>
+            <p>К этому курсу пока не добавлен квиз.</p>
         {% endif %}
-    {% endfor %}
-{% else %}
-    <p>К этому курсу пока не добавлен квиз.</p>
-{% endif %}
-
+    
+        {% if not is_enrolled and not is_teacher %}
+        <form method="post" action="{% url 'online_courses:enroll_course' course.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Записаться на курс</button>
+        </form>
+        {% endif %}
+    
+        <a href="{% url 'online_courses:home' %}" class="btn btn-primary">Вернуться на главную</a>
+    </div>
+</div>
 {% endblock %}

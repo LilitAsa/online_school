@@ -98,8 +98,7 @@ def course_list(request):
         courses = request.user.enrolled_courses.all()
     return render(request, 'course_list.html', {'courses': courses})
 
-# Детали курса
-@login_required
+# Детали курса@login_required
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     is_teacher = request.user == course.teacher
@@ -107,16 +106,18 @@ def course_detail(request, course_id):
 
     if is_teacher or is_enrolled:
         quizzes = course.quizzes.all()  # Получаем все квизы для курса
+        modules = course.modules.prefetch_related('lessons')  # Получаем модули и связанные уроки
     else:
         quizzes = []  # Не передаём квизы, если пользователь не подписан и не преподаватель
+        modules = []  # Не передаём модули, если пользователь не подписан и не преподаватель
 
     return render(request, "course_detail.html", {
         "course": course,
         "is_teacher": is_teacher,
         "is_enrolled": is_enrolled,
         "quizzes": quizzes,
+        "modules": modules,  # Передаём модули в шаблон
     })
-
 
 # Modules
 @login_required
@@ -140,10 +141,9 @@ def enroll_course(request, course_id):
         raise PermissionDenied("Только студенты могут записываться на курсы.")
     
     if request.method == "POST":
-        Enrollment.objects.get_or_create(user=request.user, course=course)
+        course.students.add(request.user)  # Add the student to the course
+        messages.success(request, f"Вы успешно записались на курс: {course.title}.")
         return redirect('online_courses:course_detail', course_id=course.id)
-    
-    course.students.add(request.user)
 
     return render(request, 'enroll_course.html', {'course': course})
 
@@ -166,7 +166,38 @@ def add_homework(request):
     
     return render(request, 'add_homework.html', {'form': form})
 
-# Прохождение теста
+
+@login_required
+@teacher_required
+def add_module_and_lesson(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        if 'add_module' in request.POST:  # Добавление модуля
+            module_title = request.POST.get('module_title')
+            if module_title:
+                Module.objects.create(course=course, title=module_title)
+                messages.success(request, "Модуль успешно добавлен.")
+            else:
+                messages.error(request, "Название модуля не может быть пустым.")
+        
+        elif 'add_lesson' in request.POST:  # Добавление урока
+            lesson_title = request.POST.get('lesson_title')
+            module_id = request.POST.get('lesson_module')
+            lesson_content = request.POST.get('lesson_content')
+
+            if not lesson_title or not module_id:
+                messages.error(request, "Название урока и модуль обязательны.")
+            else:
+                module = get_object_or_404(Module, id=module_id, course=course)
+                Lesson.objects.create(course=course, module=module, title=lesson_title, content=lesson_content)
+                messages.success(request, "Урок успешно добавлен.")
+
+        return redirect('online_courses:add_module_and_lesson', course_id=course.id)
+
+    modules = Module.objects.filter(course=course)
+    return render(request, 'add_module_and_lesson.html', {'course': course, 'modules': modules})
+
 @login_required
 def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
@@ -278,6 +309,7 @@ def add_course(request):
             course.save()  # Save the Course object to the database
             form.save_m2m()  # Save the many-to-many data for the form
             course.students.add(request.user)  # Add the teacher to the students many-to-many field
+            messages.success(request, "Курс успешно добавлен.")
             return redirect('online_courses:manage_courses')  # Redirect to the manage courses page
     else:
         form = CourseForm()
@@ -303,37 +335,11 @@ def manage_courses(request):
     return render(request, 'manage_courses.html', {'courses': courses})
 
 @login_required
-def add_lesson(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-
-    if request.user != course.teacher:
-        return redirect("home")  
-
-    if request.method == "POST":
-        form = LessonForm(request.POST)
-        if form.is_valid():
-            lesson = form.save(commit=False)
-            lesson.course = course
-            lesson.save()
-            return redirect("course_detail", course_id=course.id)
-    else:
-        form = LessonForm()
-
-    return render(request, "add_lesson.html", {"form": form, "course": course})
-
-@login_required
 def add_quiz(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    lesson_id = request.POST.get("lesson")
-    
-    if lesson_id:
-        lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
-        if lesson.course != course:
-            return redirect("home")  # Защита от подмены данных
-        quiz.lesson = lesson
 
     if request.user != course.teacher:
-        return redirect("home")  
+        return redirect("home")  # Only teachers can add quizzes
 
     if request.method == "POST":
         form = QuizForm(request.POST)
@@ -343,16 +349,18 @@ def add_quiz(request, course_id):
 
             lesson_id = request.POST.get("lesson")
             if lesson_id:
-                quiz.lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
-            
-            quiz.lesson = lesson
+                lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
+                quiz.lesson = lesson
+
             quiz.save()
+            messages.success(request, "Квиз успешно добавлен.")
             return redirect('online_courses:course_detail', course_id=course.id)
+        else:
+            messages.error(request, "Ошибка при добавлении квиза. Проверьте форму.")
     else:
         form = QuizForm()
 
-    lessons = course.lessons.all()  
-
+    lessons = course.lessons.all()  # Get all lessons for the course
     return render(request, "add_quiz.html", {"form": form, "course": course, "lessons": lessons})
 
 @login_required
@@ -397,6 +405,14 @@ def student_dashboard(request):
     quizzes = Quiz.objects.filter(course__students=request.user)
 
     return render(request, 'student_dashboard.html', {'assignments': assignments, 'quizzes': quizzes})
+
+@login_required
+def available_courses(request):
+    # Fetch courses the user is not enrolled in
+    enrolled_courses = request.user.enrolled_courses.all() if request.user.role == 'student' else []
+    available_courses = Course.objects.exclude(id__in=enrolled_courses)
+
+    return render(request, 'available_courses.html', {'available_courses': available_courses})
 
 def teacher_list(request):
     teachers = User.objects.filter(role='teacher')

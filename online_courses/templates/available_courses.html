@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Доступные курсы{% endblock %}
+
+{% block content %}
+<h1>Доступные курсы</h1>
+<ul class="list-group">
+    {% for course in available_courses %}
+        <li class="course-card">
+            <a href="{% url 'online_courses:course_detail' course.id %}" class="text-decoration-none">{{ course.title }}</a>
+            <form method="post" action="{% url 'online_courses:enroll_course' course.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-primary">Записаться</button>
+            </form>
+        </li>
+    {% empty %}
+        <p>Нет доступных курсов для записи.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -66,19 +66,24 @@ class CourseForm(forms.ModelForm):
         }
 
 
+
 class LessonForm(forms.ModelForm):
+    module = forms.ModelChoiceField(
+        queryset=Module.objects.none(),  # Default to no modules
+        label="Выберите модуль",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
     class Meta:
         model = Lesson
-        fields = ['module', 'title', 'content', 'video_url', 'file']
-        widgets = {
-            'module': forms.Select(attrs={'class': 'form-control'}),
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control'}),
-            'video_url': forms.URLInput(attrs={'class': 'form-control'}),
-            'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-        }   
+        fields = ['title', 'content', 'module']
 
-
+    def __init__(self, *args, **kwargs):
+        course = kwargs.pop('course', None)  # Pass the course to filter modules
+        super().__init__(*args, **kwargs)
+        if course:
+            self.fields['module'].queryset = Module.objects.filter(course=course)
+            
 class HomeworkForm(forms.ModelForm):
     class Meta:
         model = Homework

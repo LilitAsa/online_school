@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить модуль и урок{% endblock %}
+
+{% block content %}
+<div class="container mt-4 d-flex flex-row align-items-center justify-content-between">
+    <div>
+        <h1>{{ course.title }}</h1>
+        <p><strong>Описание:</strong> {{ course.description }}</p>
+        <p><strong>Преподаватель:</strong> {{ course.teacher }}</p>
+        <hr>
+        <h2 class="fade-in">Добавить модуль</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="module_title" class="form-label">Название модуля:</label>
+                <input type="text" id="module_title" name="module_title" class="form-control" required>
+            </div>
+            <button type="submit" name="add_module" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Добавить модуль
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <h2 class="fade-in">Добавить урок</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="lesson_title" class="form-label">Название урока:</label>
+                <input type="text" id="lesson_title" name="lesson_title" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="lesson_module" class="form-label">Выберите модуль:</label>
+                <select id="lesson_module" name="lesson_module" class="form-select" required>
+                    <option value="" disabled selected>Выберите модуль</option>
+                    {% for module in modules %}
+                        <option value="{{ module.id }}">{{ module.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="mb-3">
+                <label for="lesson_content" class="form-label">Содержание урока:</label>
+                <textarea id="lesson_content" name="lesson_content" class="form-control" rows="5" required></textarea>
+            </div>
+    
+            <button type="submit" name="add_lesson" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Добавить урок
+            </button>
+        </form>
+    </div>
+    <a href="{% url 'online_courses:course_detail' course.id %}" class="btn btn-secondary">Вернуться к курсу</a>
+
+</div>
+{% endblock %}
