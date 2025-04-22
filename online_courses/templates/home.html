@@ -3,6 +3,11 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
+
+{% if request.user.is_superuser %}
+    <h6>Администратора</h6>
+{% endif %}
+
 <div class="container mt-4" >
     <h1 class="fade-in">Добро пожаловать на учебную платформу!</h1>
     <p>Привет, {{ user.username }}!</p>

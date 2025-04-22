@@ -3,13 +3,16 @@
 {% block title %}Студенческая панель{% endblock %}
 
 {% block content %}
-<h1>Студенческая панель</h1>
+<h1 class="fade-in">Студенческая панель</h1>
+
+<p><a href="{% url 'online_courses:student_submissions' %}">Перейти к моим отправленным домашним заданиям</a></p>
 
 {% if assignments %}
     <ul>
         {% for assignment in assignments %}
             <li>
                 <p><strong>Курс:</strong> {{ assignment.course.title }}</p>
+                <p><strong>Учитель:</strong> {{ assignment.course.teacher }}</p>
                 <p><strong>Задание:</strong> {{ assignment.title }}</p>
                 <p><strong>Описание:</strong> {{ assignment.description }}</p>
                 <p><strong>Срок сдачи:</strong> {{ assignment.due_date }}</p>

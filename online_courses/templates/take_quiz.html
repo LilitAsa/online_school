@@ -5,6 +5,9 @@
 {% block content %}
 <div class="quiz">
     <h2>{{ quiz.title }}</h2>
+    <h3>{{ quiz.description }}</h3>
+    <h3>{{ quiz.description }}</h3>
+    <p></p>
     <form method="post">
         {% csrf_token %}
         {% for question in quiz.questions.all %}
@@ -13,7 +16,7 @@
                 <ul class="answers">
                     {% for choice in question.get_choices %}
                         <li class="course-card">
-                            <label>
+                            <label class="w-100">
                                 <input type="radio" name="question_{{ question.id }}" value="{{ choice }}">
                                 {{ choice }}
                             </label>

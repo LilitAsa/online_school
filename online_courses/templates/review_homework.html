@@ -7,7 +7,7 @@
 
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 {% endif %}
 
@@ -18,7 +18,7 @@
             <p><strong>Ответ:</strong> {{ submission.submission_text }}</p>
             <p><strong>Задание:</strong> {{ submission.homework.title }}</p>
             <p><strong>Оценка:</strong> {{ submission.grade }}</p>
-            <p><strong>Оценка:</strong> {{ submission.status }}</p>
+            <p><strong>Статус:</strong> {{ submission.status|default:"Не определено" }}</p>
             
             {% if submission.file %}
                 <p><strong>Файл:</strong> <a href="{{ submission.file.url }}">Скачать</a></p>

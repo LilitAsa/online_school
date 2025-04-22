@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои отправленные домашние задания{% endblock %}
+
+{% block content %}
+<h1>Мои отправленные домашние задания</h1>
+
+{% if submissions %}
+    <ul>
+        {% for submission in submissions %}
+            <li>
+                <p><strong>Задание:</strong> {{ submission.homework.title }}</p>
+                <p><strong>Оценка:</strong> {{ submission.grade }}</p>
+                <p><strong>Статус:</strong> {{ submission.status }}</p>
+                <p><strong>Дата отправки:</strong> {{ submission.submitted_at }}</p>
+
+                {% if submission.file_submission %}
+                    <p><strong>Файл:</strong> <a href="{{ submission.file_submission.url }}" target="_blank">Скачать</a></p>
+                {% else %}
+                    <p><strong>Файл не прикреплен.</strong></p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Вы ещё не отправляли домашние задания.</p>
+{% endif %}
+{% endblock %}

@@ -4,12 +4,40 @@
 
 {% block content %}
 <h1>{{ lesson.title }}</h1>
-<p>{{ lesson.content }}</p>
+
+<p>{{  lesson.content|safe }}</p>
+
+<!-- Изображение урока -->
+{% if lesson.image %}
+  <h3>Изображение урока</h3>
+  <img src="{{ lesson.image.url }}" alt="Изображение урока" width="600" class="zoomable">
+{% endif %}
+
+<!-- Встроенное локальное видео -->
+{% if lesson.video %}
+  <h3>Видео урок</h3>
+  <video width="600" controls>
+    <source src="{{ lesson.video.url }}" type="video/mp4">
+    Ваш браузер не поддерживает видео.
+  </video>
+{% endif %}
+
+<!-- Вставка видео с YouTube -->
+{% if lesson.video_url %}
+  <h3>Видео урок</h3>
+  <iframe width="600" height="350" src="{{ lesson.video_url }}" frameborder="0" allowfullscreen></iframe>
+{% endif %}
+
+<!-- Файл урока -->
+{% if lesson.file %}
+  <h3>Дополнительные материалы</h3>
+  <p>
+    <a href="{{ lesson.file.url }}" download>Скачать файл урока</a>
+  </p>
+{% endif %}
 
 <p>
-  <a href="{% url 'online_courses:course_detail' course.id %}">
-    Back to course
-  </a>
+  <a href="{% url 'online_courses:course_detail' course.id %}">Назад к курсу</a>
 </p>
 
 {% endblock %}

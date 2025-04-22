@@ -1,8 +1,6 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from .models import *
@@ -16,7 +14,7 @@ from functools import wraps
 def teacher_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.role != 'teacher':
+        if getattr(request.user, 'role', None) != 'teacher':
             raise PermissionDenied("Доступ запрещен. Вход только учителям")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
@@ -62,7 +60,7 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"Вы вошли как {username}.")
-                if user.role == 'student':
+                if getattr(user, 'role', None) == 'student':
                     return redirect('online_courses:student_dashboard')
                 else:
                     return redirect('online_courses:home')
@@ -75,8 +73,8 @@ def user_login(request):
     return render(request, "login.html", {"form": form})
 
 def user_logout(request):
-    logout(request) 
-    return render(request, "logout.html")
+    logout(request)
+    return redirect("online_courses:home")
 
 def register(request):
     if request.method == "POST":
@@ -165,7 +163,6 @@ def add_homework(request):
         form = HomeworkForm()
     
     return render(request, 'add_homework.html', {'form': form})
-
 
 @login_required
 @teacher_required
@@ -258,24 +255,37 @@ def quiz_detail(request, quiz_id):
 def submit_homework(request, homework_id):
     homework = get_object_or_404(Homework, id=homework_id)
 
+    # Проверка, что только студенты могут отправлять домашние задания
     if request.user.role != 'student':
         raise PermissionDenied("Только студенты могут отправлять домашние задания.")
 
     if request.method == 'POST':
         submission_text = request.POST.get('submission_text')
-        HomeworkSubmission.objects.create(
+        file = request.FILES.get('file_submission')  # Получаем файл из формы
+
+        # Создаем запись о домашнем задании
+        submission = HomeworkSubmission.objects.create(
             homework=homework,
             student=request.user,
-            submission_text=submission_text
+            submission_text=submission_text,
+            file_submission=file  # Сохраняем файл, если он был прикреплен
         )
+
         messages.success(request, "Домашнее задание успешно отправлено.")
-        return redirect('online_courses:student_dashboard')
+        return redirect('online_courses:student_dashboard')  # Перенаправление на дашборд студента
 
     return render(request, 'submit_homework.html', {'homework': homework})
+
+@login_required
+def student_submissions(request):
+    submissions = HomeworkSubmission.objects.filter(student=request.user)
+
+    return render(request, 'student_submissions.html', {'submissions': submissions})
 
 # Проверка домашних заданий
 @teacher_required
 @login_required
+
 def review_homework(request, submission_id):
     submission = HomeworkSubmission.objects.filter(id=submission_id).first()
 
@@ -286,13 +296,20 @@ def review_homework(request, submission_id):
         form = ReviewHomeworkForm(request.POST, instance=submission)
         if form.is_valid():
             form.save()
+
+            # Перезагружаем объект из базы, чтобы получить актуальный статус
+            submission.refresh_from_db()
+
+            # Проверка актуального статуса
             if submission.status == 'rejected':
                 messages.warning(request, "Статус: Отклонена.")
             elif submission.status == 'pending':
-                messages.warning(request, "Статус: На проверке.")
+
+                messages.success(request, "Оценка: На проверке.")
             else:
                 messages.success(request, "Оценка успешно обновлена.")
-            return redirect('online_courses:review_homework', submission_id=submission.id)  # Redirect to the same page to see the updated grade
+
+            return redirect('online_courses:review_homework', submission_id=submission.id)  # Перенаправление на ту же страницу для отображения обновлённой оценки
     else:
         form = ReviewHomeworkForm(instance=submission)
 
@@ -339,7 +356,7 @@ def add_quiz(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
     if request.user != course.teacher:
-        return redirect("home")  # Only teachers can add quizzes
+        return redirect("online_courses:home")  # Only teachers can add quizzes
 
     if request.method == "POST":
         form = QuizForm(request.POST)
@@ -398,13 +415,15 @@ def account(request):
 @login_required
 def student_dashboard(request):
     if request.user.role != 'student':
-        raise PermissionDenied("Только студенты могут просматривать эту страницу.")
-
-    # Get the list of assignments for the student
-    assignments = Homework.objects.filter(course__students=request.user)
+        raise PermissionDenied("Вы не имеете доступа к этой странице.")
+    
+    assignments = Homework.objects.filter(assigned_to=request.user)
     quizzes = Quiz.objects.filter(course__students=request.user)
 
-    return render(request, 'student_dashboard.html', {'assignments': assignments, 'quizzes': quizzes})
+    return render(request, 'student_dashboard.html', {
+        'assignments': assignments,
+        'quizzes': quizzes,
+    })
 
 @login_required
 def available_courses(request):

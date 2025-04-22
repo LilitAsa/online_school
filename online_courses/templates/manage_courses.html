@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Управление курсами</h2>
+<h2 class="fade-in">Управление курсами</h2>
 
 <a href="{% url 'online_courses:add_course' %}" class="btn btn-primary">Добавить курс</a>
 
@@ -19,7 +19,7 @@
             <td>{{ course.title }}</td>
             <td>{{ course.description }}</td>
             <td>
-                <a href="{% url 'online_courses:course_detail' course.id %}" class="btn btn-info">Просмотр</a>
+                <a href="{% url 'online_courses:course_detail' course.id %}" class="btn btn-info mb-2">Просмотр</a>
                 <a href="{% url 'online_courses:delete_course' course.id %}" class="btn btn-danger"
                    onclick="return confirm('Вы уверены, что хотите удалить этот курс?');">Удалить</a>
             </td>

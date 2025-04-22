@@ -18,9 +18,15 @@ class ModuleAdmin(admin.ModelAdmin):
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module')  
+    list_display = ('title', 'course', 'module', 'video', 'image', 'file')
     search_fields = ('title', 'module__title')  
-    list_filter = ('module',)  
+    list_filter = ('module', 'course')  
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs  # Суперпользователь видит всё
+        return qs.filter(module__course__teacher=request.user)  # Учитель видит только свои модули
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django_ckeditor_5.fields import CKEditor5Field
 
 # Пользователь с ролями
 class User(AbstractUser):
@@ -74,9 +75,11 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")  # Add related_name here
     title = models.CharField(max_length=200)
-    content = models.TextField(blank=True, null=True)
+    content = CKEditor5Field('Text', config_name='default', blank=True, null=True)
+    video = models.FileField(upload_to='videos/', blank=True, null=True)  # Локальные видео
     video_url = models.URLField(blank=True, null=True)
     file = models.FileField(upload_to='lessons/files/', blank=True, null=True)
+    image = models.ImageField(upload_to='lesson_images/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} (Module: {self.module.title})"
@@ -184,4 +187,4 @@ class HomeworkSubmission(models.Model):
     grade = models.PositiveIntegerField(null=True, blank=True)  # Оценка (по желанию)
 
     def __str__(self):
-        return f"{self.student.username} - {self.homework.title}"
+        return f"{self.student.username} - {self.homework.title}"   
